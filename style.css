@@ -1,0 +1,641 @@
+/* ============================================================
+   STYLE TERPADU - Tools Laporan
+   Dipakai bersama oleh: index.html, format-pm.html,
+   Format-so.html, format-bap.html
+   ============================================================ */
+
+:root {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #eff6ff;
+  --color-primary-soft: #e0e7ff;
+
+  --color-success: #10b981;
+  --color-success-dark: #059669;
+
+  --color-danger: #ef4444;
+  --color-danger-dark: #dc2626;
+  --color-danger-light: #fee2e2;
+
+  --color-warning: #f59e0b;
+
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #e2e8f0;
+
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --text-soft: #475569;
+
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 10px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 16px;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.page-wide {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+h2 {
+  text-align: center;
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+}
+
+/* ---------------- App nav (menu bar di atas tiap tool) ---------------- */
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.app-nav .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  text-decoration: none;
+  background: var(--color-primary-light);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.app-nav .back-link:hover {
+  background: var(--color-primary-soft);
+}
+
+.app-nav .app-name {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ---------------- Kartu / container umum ---------------- */
+
+.card,
+.item-card,
+.convert-card,
+.main-container {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.item-card {
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.main-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 25px;
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------------- Tab ---------------- */
+
+.tab-container {
+  display: flex;
+  margin-bottom: 16px;
+  background: var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--text-soft);
+  transition: all 0.2s;
+  font-family: var(--font-main);
+}
+
+.tab-btn.active {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ---------------- Input / field umum ---------------- */
+
+input,
+select,
+textarea {
+  font-family: var(--font-main);
+}
+
+.header-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.item-header-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.input-item-name {
+  flex: 2;
+  font-weight: bold;
+  color: var(--color-primary);
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.field-group,
+.field,
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-group label,
+.field label,
+.input-group label {
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  font-weight: bold;
+}
+
+.field-group input,
+.field input,
+.input-group input,
+.input-group select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.field-group input[readonly] {
+  background-color: var(--surface-alt);
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+input,
+select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius-sm);
+  font-size: 0.85em;
+}
+
+/* ---------------- Textarea / output ---------------- */
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.output-area {
+  height: 180px;
+  margin-top: 12px;
+}
+
+.convert-card textarea,
+.convert-input {
+  height: 90px;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.output-dark {
+  background: #1f2937;
+  color: #f9fafb;
+  border: none;
+  resize: none;
+}
+
+/* ---------------- Tombol ---------------- */
+
+.btn,
+button.action-btn,
+.btn-add,
+.btn-restore-default {
+  font-family: var(--font-main);
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn {
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-row,
+.btn-container,
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+button.action-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 0.95rem;
+}
+
+.btn-primary,
+.btn-generate,
+#btnConvert {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover,
+.btn-generate:hover,
+#btnConvert:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-success,
+.btn-copy,
+#btnCopy {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.btn-success:hover,
+.btn-copy:hover,
+#btnCopy:hover {
+  background-color: var(--color-success-dark);
+}
+
+.btn-danger,
+.btn-reset,
+.btn-delete {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+.btn-danger:hover,
+.btn-reset:hover,
+.btn-delete:hover {
+  background-color: var(--color-danger-dark);
+}
+
+.btn-reset {
+  flex: 0.5;
+}
+
+.btn-warning,
+.btn-edit {
+  background-color: var(--color-warning);
+  color: white;
+}
+
+.btn-outline,
+.btn-add {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--color-primary-soft);
+  color: #3730a3;
+  border: 1px dashed #6366f1;
+  margin-bottom: 16px;
+}
+
+.btn-muted,
+.btn-restore-default {
+  width: 100%;
+  padding: 8px;
+  background-color: var(--surface-alt);
+  color: var(--text-muted);
+  border: 1px solid #d1d5db;
+  font-size: 0.8rem;
+}
+
+.btn-delete-item {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger-dark);
+  border: none;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.btn-import {
+  background: var(--color-primary);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-import:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-submit-all {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.btn-submit-all:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ---------------- Kotak info / hint / preview ---------------- */
+
+.hint-box {
+  background-color: var(--color-primary-light);
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.active-items-preview,
+.preview-box {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  margin-bottom: 12px;
+}
+
+.import-box {
+  background: var(--color-primary-light);
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px dashed #3b82f6;
+  margin-bottom: 20px;
+}
+
+.import-box textarea {
+  width: 100%;
+  height: 80px;
+  background: white;
+  color: var(--text);
+  border: 1px solid #cbd5e1;
+  margin-top: 6px;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+.status-text {
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+/* ---------------- Grid multi kategori (BAP) ---------------- */
+
+.multi-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.kat-row {
+  display: grid;
+  grid-template-columns: 140px repeat(4, 1fr);
+  gap: 10px;
+  background: var(--surface-alt);
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  align-items: center;
+}
+
+.kat-label {
+  font-weight: bold;
+  color: #1e3a8a;
+  font-size: 0.9em;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+  .kat-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .kat-label {
+    grid-column: span 2;
+  }
+}
+
+/* ---------------- Tabel ---------------- */
+
+.table-container,
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  max-height: 420px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+  text-align: left;
+}
+
+th {
+  background: var(--surface-alt);
+  padding: 10px;
+  border-bottom: 2px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:hover {
+  background: var(--surface-alt);
+}
+
+.action-btns button {
+  padding: 3px 8px;
+  font-size: 0.9em;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-right: 2px;
+}
+
+/* ============================================================
+   MENU UTAMA (index.html)
+   ============================================================ */
+
+.menu-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.menu-header h1 {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.menu-header p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.menu-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.menu-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.menu-card .menu-icon {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.menu-card .menu-text {
+  flex: 1;
+}
+
+.menu-card .menu-text .menu-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.menu-card .menu-text .menu-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.menu-card .menu-arrow {
+  flex: 0 0 auto;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Laporan Sales Toko</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+
+    <div class="app-nav">
+        <a href="index.html" class="back-link">← Menu</a>
+        <span class="app-name">Laporan Sales</span>
+    </div>
+
+    <h2>Generator Laporan Sales</h2>
+
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('manual')">Input / Pengaturan Item</button>
+        <button class="tab-btn" onclick="switchTab('convert')">Convert Teks</button>
+    </div>
+
+    <input type="text" id="headerText" class="header-input" value="*TOKO T7YB  CABENGE 219 SOPPENG*" oninput="saveHeader()">
+
+    <!-- TAB 1: FORM INPUT MANUAL & PENGATURAN ITEM -->
+    <div id="tabManual" class="tab-content active">
+        <div id="itemsContainer"></div>
+        <button class="btn-add" onclick="addItem()">+ Tambah Item Baru</button>
+        
+        <div class="btn-container">
+            <button class="action-btn btn-generate" onclick="generateReport()">Buat Teks</button>
+            <button class="action-btn btn-copy" onclick="copyReport('outputManual')">Salin Teks</button>
+            <button class="action-btn btn-reset" onclick="resetForm()">Reset Input</button>
+        </div>
+
+        <button class="btn-restore-default" onclick="restoreDefaultItems()">Reset Pengaturan Item Ke Default</button>
+        <textarea id="outputManual" class="output-area" readonly placeholder="Hasil format laporan akan muncul di sini..."></textarea>
+    </div>
+
+    <!-- TAB 2: CONVERT TEKS ANGKA -->
+    <div id="tabConvert" class="tab-content">
+        <div class="convert-card">
+            <div class="hint-box">
+                <strong>Format Teks:</strong> Masukkan deretan angka dipisah spasi dan garis miring (<code>/</code>).<br>
+                <em>Contoh:</em> <code>1 2 3 4 5 6 7 8 9 10 11 12 / 10 20 30 40 50 60 70 80 90 100 110 120</code><br>
+                (Angka sebelum <code>/</code> = Sales, Angka setelah <code>/</code> = AKM)
+            </div>
+
+            <div class="active-items-preview" id="itemsPreview">
+                Jumlah item terdeteksi: <strong>0 item</strong>
+            </div>
+            
+            <label for="rawInput">Tempel Teks Angka Di Sini:</label>
+            <textarea id="rawInput" class="convert-input" placeholder="Masukkan angka sales / akm..."></textarea>
+
+            <div class="btn-container">
+                <button class="action-btn btn-generate" onclick="convertTextToReport()">Convert Ke Laporan</button>
+                <button class="action-btn btn-copy" onclick="copyReport('outputConvert')">Salin Teks</button>
+            </div>
+        </div>
+
+        <textarea id="outputConvert" class="output-area" readonly placeholder="Hasil convert laporan akan muncul di sini..."></textarea>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        const defaultItems = [
+            { name: "AQUA", target: 99 },
+            { name: "BANGO", target: 12 },
+            { name: "CHUBA", target: 11 },
+            { name: "IDM LARRIST TISSUE", target: 6 },
+            { name: "LARRIST TISSUE", target: 68 },
+            { name: "MAKARIZO", target: 5 },
+            { name: "MILKU", target: 47 },
+            { name: "NESTLE CEREAL", target: 14 },
+            { name: "RINSO", target: 11 },
+            { name: "SHINZUI", target: 14 },
+            { name: "SO GOOD", target: 32 },
+            { name: "TUJUH KURMA NIPIS", target: 107 }
+        ];
+
+        let items = [];
+
+        function loadSavedData() {
+            items = ambilData("salesReportItems", [...defaultItems]);
+
+            const savedHeader = ambilTeks("salesReportHeader");
+            if (savedHeader) {
+                document.getElementById("headerText").value = savedHeader;
+            }
+        }
+
+        function saveItems() {
+            simpanData("salesReportItems", items);
+        }
+
+        function saveHeader() {
+            const headerVal = document.getElementById("headerText").value;
+            simpanTeks("salesReportHeader", headerVal);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'manual') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tabManual').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tabConvert').classList.add('active');
+                updateItemsPreview();
+            }
+        }
+
+        function renderForm() {
+            const container = document.getElementById("itemsContainer");
+            container.innerHTML = "";
+
+            items.forEach((item, index) => {
+                const card = document.createElement("div");
+                card.className = "item-card";
+                card.innerHTML = `
+                    <div class="item-header-group">
+                        <input type="text" id="name_${index}" class="input-item-name" value="${item.name}" placeholder="NAMA ITEM" oninput="updateItemName(${index}, this.value)">
+                        <button class="btn-delete-item" onclick="deleteItem(${index})">Hapus</button>
+                    </div>
+                    <div class="field-grid">
+                        <div class="field-group">
+                            <label>TARGET:</label>
+                            <input type="number" id="target_${index}" value="${item.target}" placeholder="Target" oninput="calculateAch(${index})">
+                        </div>
+                        <div class="field-group">
+                            <label>SALES:</label>
+                            <input type="number" id="sales_${index}" class="input-nav" placeholder="Sales">
+                        </div>
+                        <div class="field-group">
+                            <label>AKM:</label>
+                            <input type="number" id="akm_${index}" class="input-nav" placeholder="AKM" oninput="calculateAch(${index})">
+                        </div>
+                        <div class="field-group">
+                            <label>ACH % (OTOMATIS):</label>
+                            <input type="text" id="ach_${index}" readonly placeholder="0%">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            setupEnterNavigation();
+        }
+
+        function updateItemName(index, value) {
+            items[index].name = value;
+            saveItems();
+        }
+
+        function calculateAch(index) {
+            const targetVal = parseFloat(document.getElementById(`target_${index}`).value) || 0;
+            const akmVal = parseFloat(document.getElementById(`akm_${index}`).value) || 0;
+            const achInput = document.getElementById(`ach_${index}`);
+
+            if (targetVal > 0) {
+                const ach = Math.round((akmVal / targetVal) * 100);
+                achInput.value = `${ach}%`;
+            } else {
+                achInput.value = "0%";
+            }
+
+            items[index].target = targetVal;
+            saveItems();
+        }
+
+        function setupEnterNavigation() {
+            const inputs = Array.from(document.querySelectorAll(".input-nav"));
+            inputs.forEach((input, index) => {
+                input.addEventListener("keydown", function(e) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        const nextInput = inputs[index + 1];
+                        if (nextInput) {
+                            nextInput.focus();
+                        } else {
+                            generateReport();
+                        }
+                    }
+                });
+            });
+        }
+
+        function addItem() {
+            items.push({ name: "ITEM BARU", target: 0 });
+            saveItems();
+            renderForm();
+            const lastIndex = items.length - 1;
+            document.getElementById(`name_${lastIndex}`).focus();
+        }
+
+        function deleteItem(index) {
+            if (confirm(`Hapus item "${items[index].name}"?`)) {
+                items.splice(index, 1);
+                saveItems();
+                renderForm();
+            }
+        }
+
+        function restoreDefaultItems() {
+            if (confirm("Kembalikan daftar item ke susunan awal/default? Semua perubahan item kustom akan diset ulang.")) {
+                items = JSON.parse(JSON.stringify(defaultItems));
+                saveItems();
+                renderForm();
+            }
+        }
+
+        function updateItemsPreview() {
+            const previewEl = document.getElementById("itemsPreview");
+            previewEl.innerHTML = `Jumlah item terdeteksi: <strong>${items.length} item</strong> (Mengikuti susunan dari tab Input/Pengaturan)`;
+        }
+
+        function generateReport() {
+            const header = document.getElementById("headerText").value;
+            let result = `${header}\n\nItem/target/sales/akm/ach%\n\n`;
+
+            items.forEach((item, index) => {
+                const itemName = document.getElementById(`name_${index}`).value.trim();
+                const target = document.getElementById(`target_${index}`).value || "0";
+                const sales = document.getElementById(`sales_${index}`).value || "0";
+                const akm = document.getElementById(`akm_${index}`).value || "0";
+                const ach = document.getElementById(`ach_${index}`).value || "0%";
+
+                result += `*${itemName.toUpperCase()}*\n=${target}_${sales}_${akm}_${ach}\n`;
+            });
+
+            document.getElementById("outputManual").value = result;
+        }
+
+        function convertTextToReport() {
+            const rawText = document.getElementById("rawInput").value.trim();
+            if (!rawText) {
+                alert("Masukkan teks angka terlebih dahulu!");
+                return;
+            }
+
+            const parts = rawText.split('/');
+            if (parts.length < 2) {
+                alert("Format salah! Gunakan tanda garis miring (/) untuk memisahkan Sales dan AKM.\nContoh: 1 2 3 / 4 5 6");
+                return;
+            }
+
+            const salesArray = parts[0].trim().split(/\s+/).map(Number);
+            const akmArray = parts[1].trim().split(/\s+/).map(Number);
+
+            const header = document.getElementById("headerText").value;
+            let result = `${header}\n\nItem/target/sales/akm/ach%\n\n`;
+
+            items.forEach((item, index) => {
+                const sales = salesArray[index] !== undefined ? salesArray[index] : 0;
+                const akm = akmArray[index] !== undefined ? akmArray[index] : 0;
+                
+                let ach = 0;
+                if (item.target > 0) {
+                    ach = Math.round((akm / item.target) * 100);
+                }
+
+                result += `*${item.name.toUpperCase()}*\n=${item.target}_${sales}_${akm}_${ach}%\n`;
+            });
+
+            document.getElementById("outputConvert").value = result;
+        }
+
+        function copyReport(targetId) {
+            salinKeClipboard(targetId, {
+                successMessage: "Laporan berhasil disalin ke clipboard!"
+            });
+        }
+
+        function resetForm() {
+            if (confirm("Kosongkan nilai Sales, AKM, dan ACH%?")) {
+                items.forEach((_, index) => {
+                    document.getElementById(`sales_${index}`).value = "";
+                    document.getElementById(`akm_${index}`).value = "";
+                    document.getElementById(`ach_${index}`).value = "0%";
+                });
+                document.getElementById("outputManual").value = "";
+                const firstSales = document.getElementById("sales_0");
+                if (firstSales) firstSales.focus();
+            }
+        }
+
+        window.onload = function() {
+            loadSavedData();
+            renderForm();
+        };
+    </script>
+  </div>
+</body>
+</html>

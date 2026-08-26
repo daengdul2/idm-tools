@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Format Text Converter - SO PRODSUS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+
+    <div class="app-nav">
+        <a href="index.html" class="back-link">← Menu</a>
+        <span class="app-name">Format SO Prodsus</span>
+    </div>
+
+    <h2>Text Format Converter</h2>
+    <div class="card">
+        <div class="field">
+            <label>Masukkan Teks Asli:</label>
+            <textarea id="inputText" class="convert-input" placeholder="contoh :
+SAY BREAD
+20087465, SOSIS 4/3
+20090979, CHOCO STRIPE 4/0..."></textarea>
+        </div>
+
+        <div class="btn-group">
+            <button id="btnConvert" class="btn btn-primary" onclick="convertText()">Konversi Format</button>
+            <button id="btnCopy" class="btn btn-success" onclick="salinKeClipboard('outputText', {statusElementId: 'status'})">Salin Hasil</button>
+        </div>
+
+        <div class="field">
+            <label>Hasil Konversi:</label>
+            <textarea id="outputText" class="output-area" readonly></textarea>
+        </div>
+        <div id="status" class="status-text"></div>
+    </div>
+  </div>
+
+    <script src="common.js"></script>
+    <script>
+        function convertText() {
+            const input = document.getElementById('inputText').value;
+            const lines = input.split('\n');
+            const opsiTanggal = { day: 'numeric', month: 'long', year: 'numeric' };
+            const tanggalHariIni = new Date().toLocaleDateString('id-ID', opsiTanggal);
+            
+            const resultLines = ["*HASIL SO PRODSUS*", `${tanggalHariIni} ( shift 4)`, ""];
+            let currentCategory = "";
+            let categoryItems = [];
+
+            for (let line of lines) {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) continue;
+
+                const matchDuaAngka = trimmedLine.match(/(\d+)[\/\s](\d+)\s*$/);
+                const matchSatuAngka = trimmedLine.match(/(\d+)\s*$/);
+
+                if (!trimmedLine.match(/^\d+,/)) {
+                    if (currentCategory && categoryItems.length > 0) {
+                        resultLines.push(`*${currentCategory}*`, ...categoryItems, "");
+                    }
+                    currentCategory = trimmedLine;
+                    categoryItems = [];
+                    continue;
+                }
+
+                let itemName = trimmedLine.split(',')[1].trim();
+
+                if (matchDuaAngka) {
+                    const num1 = parseInt(matchDuaAngka[1], 10);
+                    const num2 = parseInt(matchDuaAngka[2], 10);
+                    if (num1 === num2) continue;
+                    itemName = itemName.replace(/(\d+)[\/\s](\d+)\s*$/, '').trim();
+                    const prefix = num1 < num2 ? `(+${num2 - num1})` : `(-${num1 - num2})`;
+                    categoryItems.push(`${prefix}${itemName}`);
+                } else if (matchSatuAngka) {
+                    const num = matchSatuAngka[1];
+                    itemName = itemName.replace(/(\d+)\s*$/, '').trim();
+                    categoryItems.push(`(${num})${itemName}`);
+                }
+            }
+
+            if (currentCategory && categoryItems.length > 0) {
+                resultLines.push(`*${currentCategory}*`, ...categoryItems);
+            }
+            document.getElementById('outputText').value = resultLines.join('\n');
+        }
+    </script>
+</body>
+</html>
+
