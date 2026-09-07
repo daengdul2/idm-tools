@@ -100,3 +100,20 @@ function simpanTeks(key, value) {
 function ambilTeks(key) {
     return localStorage.getItem(key);
 }
+
+/**
+ * Menjalankan `callback` hanya jika user menekan OK pada dialog konfirmasi.
+ * Dipakai untuk pola berulang "konfirmasi lalu hapus/reset data" yang muncul
+ * di beberapa tools (hapus item, reset form, hapus semua data, dsb).
+ *
+ * @param {string} pesan - teks yang ditampilkan pada dialog confirm()
+ * @param {function} callback - aksi yang dijalankan jika user menyetujui
+ * @returns {boolean} true jika user menyetujui & callback dijalankan
+ */
+function konfirmasiLaluJalankan(pesan, callback) {
+    if (confirm(pesan)) {
+        callback();
+        return true;
+    }
+    return false;
+}

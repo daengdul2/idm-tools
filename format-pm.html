@@ -22,9 +22,9 @@
         <button class="tab-btn" data-tab="import" onclick="switchTab('import')">Import dari Teks Laporan</button>
     </div>
 
-    <input type="text" id="headerText" class="header-input" value="*TOKO T7YB  CABENGE 219 SOPPENG*" oninput="saveHeader()">
+    <textarea id="headerText" class="header-input" oninput="saveHeader()">Laporan Penjualan Paling Murah Area HSM 03-09 SEPT 2026&#10;&#10;Kode toko : T7YB&#10;ITEM_TARGET_SALES_ACV_STOK</textarea>
 
-    <!-- TAB 1: FORM INPUT MANUAL & PENGATURAN ITEM -->
+    <!-- TAB 1: FORM INPUT MANUAL -->
     <div id="tabManual" class="tab-content active">
         <div id="itemsContainer"></div>
         <button class="btn-add" onclick="addItem()">+ Tambah Item Baru</button>
@@ -43,9 +43,8 @@
     <div id="tabConvert" class="tab-content">
         <div class="convert-card">
             <div class="hint-box">
-                <strong>Format Teks:</strong> Masukkan deretan angka dipisah spasi dan garis miring (<code>/</code>).<br>
-                <em>Contoh:</em> <code>1 2 3 4 5 6 7 8 9 10 11 12 / 10 20 30 40 50 60 70 80 90 100 110 120</code><br>
-                (Angka sebelum <code>/</code> = Sales, Angka setelah <code>/</code> = AKM)
+                <strong>Format Teks:</strong> Masukkan deretan angka sales dan stok dipisah garis miring (<code>/</code>). Jika stok tidak ada, cukup ketik angka sales saja.<br>
+                <em>Contoh:</em> <code>11 10 22 8 4 27 327 3 12 17 37 34 / 1 2 9 6 0 27 84 0 4 17 13 34</code>
             </div>
 
             <div class="active-items-preview" id="itemsPreview">
@@ -53,7 +52,7 @@
             </div>
             
             <label for="rawInput">Tempel Teks Angka Di Sini:</label>
-            <textarea id="rawInput" class="convert-input" placeholder="Masukkan angka sales / akm..."></textarea>
+            <textarea id="rawInput" class="convert-input" placeholder="Masukkan angka sales / stok..."></textarea>
 
             <div class="btn-container">
                 <button class="action-btn btn-generate" onclick="convertTextToReport()">Convert Ke Laporan</button>
@@ -68,15 +67,9 @@
     <div id="tabImport" class="tab-content">
         <div class="convert-card">
             <div class="hint-box">
-                <strong>Format Teks:</strong> Tempel seluruh teks laporan (header, nama item, dan baris <code>=target_sales_akm_ach%</code>).<br>
+                <strong>Format Teks:</strong> Tempel seluruh teks laporan.<br>
                 <em>Contoh:</em><br>
-                <code>*TOKO T7YB  CABENGE 219 SOPPENG*<br>
-                Item/target/sales/akm/ach%<br><br>
-                *CHEETOS*<br>
-                =27_3_4_14%<br>
-                *CLEAR SUNSILK*<br>
-                =5_3_3_60%</code><br><br>
-                Import akan mengganti daftar item, header, serta nilai Sales dan AKM saat ini.
+                <code>Laporan Penjualan Paling Murah Area HSM 03-09 SEPT 2026<br><br>Kode toko : T7YB<br>ITEM_TARGET_SALES_ACV_STOK<br><br>1. CAPLANG_11_1_9%_1<br>2. CLOSEP UP_10_2_20%_2</code>
             </div>
 
             <label for="importInput">Tempel Teks Laporan Di Sini:</label>
@@ -88,320 +81,8 @@
         </div>
     </div>
 
-    <script src="common.js"></script>
-    <script>
-        const defaultItems = [
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' },
-            { name: "", target: '' }
-        ];
-
-        let items = [];
-
-        function loadSavedData() {
-            items = ambilData("salesReportItems", [...defaultItems]);
-
-            const savedHeader = ambilTeks("salesReportHeader");
-            if (savedHeader) {
-                document.getElementById("headerText").value = savedHeader;
-            }
-        }
-
-        function saveItems() {
-            simpanData("salesReportItems", items);
-        }
-
-        function saveHeader() {
-            const headerVal = document.getElementById("headerText").value;
-            simpanTeks("salesReportHeader", headerVal);
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tabName);
-            });
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            if (tabName === 'manual') {
-                document.getElementById('tabManual').classList.add('active');
-            } else if (tabName === 'convert') {
-                document.getElementById('tabConvert').classList.add('active');
-                updateItemsPreview();
-            } else if (tabName === 'import') {
-                document.getElementById('tabImport').classList.add('active');
-            }
-        }
-
-        function renderForm() {
-            const container = document.getElementById("itemsContainer");
-            container.innerHTML = "";
-
-            items.forEach((item, index) => {
-                const card = document.createElement("div");
-                card.className = "item-card";
-                card.innerHTML = `
-                    <div class="item-header-group">
-                        <input type="text" id="name_${index}" class="input-item-name" value="${item.name}" placeholder="NAMA ITEM" oninput="updateItemName(${index}, this.value)">
-                        <button class="btn-delete-item" onclick="deleteItem(${index})">Hapus</button>
-                    </div>
-                    <div class="field-grid">
-                        <div class="field-group">
-                            <label>TARGET:</label>
-                            <input type="number" id="target_${index}" value="${item.target}" placeholder="Target" oninput="calculateAch(${index})">
-                        </div>
-                        <div class="field-group">
-                            <label>SALES:</label>
-                            <input type="number" id="sales_${index}" class="input-nav" placeholder="Sales">
-                        </div>
-                        <div class="field-group">
-                            <label>AKM:</label>
-                            <input type="number" id="akm_${index}" class="input-nav" placeholder="AKM" oninput="calculateAch(${index})">
-                        </div>
-                        <div class="field-group">
-                            <label>ACH % (OTOMATIS):</label>
-                            <input type="text" id="ach_${index}" readonly placeholder="0%">
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            setupEnterNavigation();
-        }
-
-        function updateItemName(index, value) {
-            items[index].name = value;
-            saveItems();
-        }
-
-        function calculateAch(index) {
-            const targetVal = parseFloat(document.getElementById(`target_${index}`).value) || 0;
-            const akmVal = parseFloat(document.getElementById(`akm_${index}`).value) || 0;
-            const achInput = document.getElementById(`ach_${index}`);
-
-            if (targetVal > 0) {
-                const ach = Math.round((akmVal / targetVal) * 100);
-                achInput.value = `${ach}%`;
-            } else {
-                achInput.value = "0%";
-            }
-
-            items[index].target = targetVal;
-            saveItems();
-        }
-
-        function setupEnterNavigation() {
-            const inputs = Array.from(document.querySelectorAll(".input-nav"));
-            inputs.forEach((input, index) => {
-                input.addEventListener("keydown", function(e) {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        const nextInput = inputs[index + 1];
-                        if (nextInput) {
-                            nextInput.focus();
-                        } else {
-                            generateReport();
-                        }
-                    }
-                });
-            });
-        }
-
-        function addItem() {
-            items.push({ name: "ITEM BARU", target: 0 });
-            saveItems();
-            renderForm();
-            const lastIndex = items.length - 1;
-            document.getElementById(`name_${lastIndex}`).focus();
-        }
-
-        function deleteItem(index) {
-            if (confirm(`Hapus item "${items[index].name}"?`)) {
-                items.splice(index, 1);
-                saveItems();
-                renderForm();
-            }
-        }
-
-        function restoreDefaultItems() {
-            if (confirm("Kembalikan daftar item ke susunan awal/default? Semua perubahan item kustom akan diset ulang.")) {
-                items = JSON.parse(JSON.stringify(defaultItems));
-                saveItems();
-                renderForm();
-            }
-        }
-
-        function updateItemsPreview() {
-            const previewEl = document.getElementById("itemsPreview");
-            previewEl.innerHTML = `Jumlah item terdeteksi: <strong>${items.length} item</strong> (Mengikuti susunan dari tab Input/Pengaturan)`;
-        }
-
-        function generateReport() {
-            const header = document.getElementById("headerText").value;
-            let result = `${header}\n\nItem/target/sales/akm/ach%\n\n`;
-
-            items.forEach((item, index) => {
-                const itemName = document.getElementById(`name_${index}`).value.trim();
-                const target = document.getElementById(`target_${index}`).value || "0";
-                const sales = document.getElementById(`sales_${index}`).value || "0";
-                const akm = document.getElementById(`akm_${index}`).value || "0";
-                const ach = document.getElementById(`ach_${index}`).value || "0%";
-
-                result += `*${itemName.toUpperCase()}*\n=${target}_${sales}_${akm}_${ach}\n`;
-            });
-
-            document.getElementById("outputManual").value = result;
-        }
-
-        function convertTextToReport() {
-            const rawText = document.getElementById("rawInput").value.trim();
-            if (!rawText) {
-                alert("Masukkan teks angka terlebih dahulu!");
-                return;
-            }
-
-            const parts = rawText.split('/');
-            if (parts.length < 2) {
-                alert("Format salah! Gunakan tanda garis miring (/) untuk memisahkan Sales dan AKM.\nContoh: 1 2 3 / 4 5 6");
-                return;
-            }
-
-            const salesArray = parts[0].trim().split(/\s+/).map(Number);
-            const akmArray = parts[1].trim().split(/\s+/).map(Number);
-
-            const header = document.getElementById("headerText").value;
-            let result = `${header}\n\nItem/target/sales/akm/ach%\n\n`;
-
-            items.forEach((item, index) => {
-                const sales = salesArray[index] !== undefined ? salesArray[index] : 0;
-                const akm = akmArray[index] !== undefined ? akmArray[index] : 0;
-                
-                let ach = 0;
-                if (item.target > 0) {
-                    ach = Math.round((akm / item.target) * 100);
-                }
-
-                result += `*${item.name.toUpperCase()}*\n=${item.target}_${sales}_${akm}_${ach}%\n`;
-            });
-
-            document.getElementById("outputConvert").value = result;
-        }
-
-        // ==== FITUR IMPORT DARI TEKS LAPORAN ====
-
-        function parseReportText(text) {
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            let header = '';
-            const parsedItems = [];
-            let i = 0;
-
-            // Baris pertama dianggap header laporan (mis. *TOKO T7YB CABENGE 219 SOPPENG*)
-            if (lines.length > 0 && lines[0].startsWith('*') && !lines[0].startsWith('=')) {
-                header = lines[0];
-                i = 1;
-            }
-
-            // Lewati baris judul kolom "Item/target/sales/akm/ach%" jika ada
-            if (lines[i] && /^item\/target/i.test(lines[i])) {
-                i++;
-            }
-
-            for (; i < lines.length; i++) {
-                const nameMatch = lines[i].match(/^\*(.+)\*$/);
-                if (nameMatch) {
-                    const name = nameMatch[1].trim();
-                    const dataLine = lines[i + 1] || '';
-                    const dataMatch = dataLine.match(/^=\s*(-?\d+(?:\.\d+)?)_(-?\d+(?:\.\d+)?)_(-?\d+(?:\.\d+)?)_(-?\d+(?:\.\d+)?)%?/);
-
-                    if (dataMatch) {
-                        parsedItems.push({
-                            name: name,
-                            target: parseFloat(dataMatch[1]) || 0,
-                            sales: parseFloat(dataMatch[2]) || 0,
-                            akm: parseFloat(dataMatch[3]) || 0
-                        });
-                        i++; // baris data sudah dipakai, lewati
-                    } else {
-                        parsedItems.push({ name: name, target: 0, sales: 0, akm: 0 });
-                    }
-                }
-            }
-
-            return { header, parsedItems };
-        }
-
-        function importFromReportText() {
-            const text = document.getElementById("importInput").value.trim();
-            if (!text) {
-                alert("Tempel teks laporan terlebih dahulu!");
-                return;
-            }
-
-            const { header, parsedItems } = parseReportText(text);
-
-            if (parsedItems.length === 0) {
-                alert("Tidak ada item yang terdeteksi. Periksa kembali format teks laporan.\n\nPastikan setiap item ditulis seperti:\n*NAMA ITEM*\n=target_sales_akm_ach%");
-                return;
-            }
-
-            const konfirmasi = confirm(`Terdeteksi ${parsedItems.length} item dari teks laporan.\n\nIni akan MENGGANTI daftar item, header, serta nilai Sales dan AKM yang ada saat ini. Lanjutkan?`);
-            if (!konfirmasi) return;
-
-            if (header) {
-                document.getElementById("headerText").value = header;
-                saveHeader();
-            }
-
-            items = parsedItems.map(p => ({ name: p.name, target: p.target }));
-            saveItems();
-            renderForm();
-
-            parsedItems.forEach((p, index) => {
-                const salesInput = document.getElementById(`sales_${index}`);
-                const akmInput = document.getElementById(`akm_${index}`);
-                if (salesInput) salesInput.value = p.sales;
-                if (akmInput) akmInput.value = p.akm;
-                calculateAch(index);
-            });
-
-            document.getElementById("importInput").value = "";
-            switchTab('manual');
-            alert("Import berhasil! Data telah diisi ke form Input/Pengaturan Item.");
-        }
-
-        function copyReport(targetId) {
-            salinKeClipboard(targetId, {
-                successMessage: "Laporan berhasil disalin ke clipboard!"
-            });
-        }
-
-        function resetForm() {
-            if (confirm("Kosongkan nilai Sales, AKM, dan ACH%?")) {
-                items.forEach((_, index) => {
-                    document.getElementById(`sales_${index}`).value = "";
-                    document.getElementById(`akm_${index}`).value = "";
-                    document.getElementById(`ach_${index}`).value = "0%";
-                });
-                document.getElementById("outputManual").value = "";
-                const firstSales = document.getElementById("sales_0");
-                if (firstSales) firstSales.focus();
-            }
-        }
-
-        window.onload = function() {
-            loadSavedData();
-            renderForm();
-        };
-    </script>
   </div>
+  <script src="common.js"></script>
+  <script src="format-pm.js"></script>
 </body>
 </html>

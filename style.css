@@ -1,7 +1,6 @@
 /* ============================================================
    STYLE TERPADU - Tools Laporan
-   Dipakai bersama oleh: index.html, format-pm.html,
-   Format-so.html, format-bap.html
+   Dipakai bersama oleh semua halaman
    ============================================================ */
 
 :root {
@@ -35,10 +34,8 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
-  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
-    monospace;
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 * {
@@ -69,7 +66,7 @@ h2 {
   font-size: 1.2rem;
 }
 
-/* ---------------- App nav (menu bar di atas tiap tool) ---------------- */
+/* ---------------- App Nav ---------------- */
 
 .app-nav {
   display: flex;
@@ -103,7 +100,7 @@ h2 {
   letter-spacing: 0.03em;
 }
 
-/* ---------------- Kartu / container umum ---------------- */
+/* ---------------- Card & Container ---------------- */
 
 .card,
 .item-card,
@@ -113,6 +110,8 @@ h2 {
   padding: 16px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
 }
 
 .item-card {
@@ -123,11 +122,11 @@ h2 {
 .main-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 25px;
+  padding: 20px;
   box-shadow: var(--shadow-md);
 }
 
-/* ---------------- Tab ---------------- */
+/* ---------------- Tabs ---------------- */
 
 .tab-container {
   display: flex;
@@ -143,7 +142,7 @@ h2 {
   border: none;
   background: transparent;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
   border-radius: 6px;
   color: var(--text-soft);
@@ -165,7 +164,7 @@ h2 {
   display: block;
 }
 
-/* ---------------- Input / field umum ---------------- */
+/* ---------------- Inputs & Controls ---------------- */
 
 input,
 select,
@@ -175,6 +174,7 @@ textarea {
 
 .header-input {
   width: 100%;
+  height: 100px;
   padding: 10px;
   margin-bottom: 16px;
   border: 1px solid #ccc;
@@ -238,16 +238,6 @@ textarea {
   font-weight: bold;
 }
 
-input,
-select {
-  padding: 6px 8px;
-  border: 1px solid #ccc;
-  border-radius: var(--radius-sm);
-  font-size: 0.85em;
-}
-
-/* ---------------- Textarea / output ---------------- */
-
 textarea {
   width: 100%;
   padding: 10px;
@@ -259,7 +249,7 @@ textarea {
 }
 
 .output-area {
-  height: 180px;
+  height: 220px;
   margin-top: 12px;
 }
 
@@ -274,10 +264,9 @@ textarea {
   background: #1f2937;
   color: #f9fafb;
   border: none;
-  resize: none;
 }
 
-/* ---------------- Tombol ---------------- */
+/* ---------------- Buttons ---------------- */
 
 .btn,
 button.action-btn,
@@ -295,11 +284,6 @@ button.action-btn,
   font-size: 0.95rem;
 }
 
-.btn-block {
-  width: 100%;
-}
-
-.btn-row,
 .btn-container,
 .btn-group {
   display: flex;
@@ -352,17 +336,6 @@ button.action-btn {
   background-color: var(--color-danger-dark);
 }
 
-.btn-reset {
-  flex: 0.5;
-}
-
-.btn-warning,
-.btn-edit {
-  background-color: var(--color-warning);
-  color: white;
-}
-
-.btn-outline,
 .btn-add {
   width: 100%;
   padding: 10px;
@@ -372,7 +345,6 @@ button.action-btn {
   margin-bottom: 16px;
 }
 
-.btn-muted,
 .btn-restore-default {
   width: 100%;
   padding: 8px;
@@ -393,20 +365,7 @@ button.action-btn {
   font-size: 0.8rem;
 }
 
-.btn-import {
-  background: var(--color-primary);
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-import:hover {
-  background: var(--color-primary-dark);
-}
-
+.btn-import,
 .btn-submit-all {
   width: 100%;
   padding: 12px;
@@ -415,15 +374,11 @@ button.action-btn {
   border: none;
   border-radius: 6px;
   font-weight: bold;
-  font-size: 1em;
+  font-size: 0.95rem;
   cursor: pointer;
 }
 
-.btn-submit-all:hover {
-  background: var(--color-primary-dark);
-}
-
-/* ---------------- Kotak info / hint / preview ---------------- */
+/* ---------------- Hint & Preview Boxes ---------------- */
 
 .hint-box {
   background-color: var(--color-primary-light);
@@ -436,8 +391,7 @@ button.action-btn {
   line-height: 1.4;
 }
 
-.active-items-preview,
-.preview-box {
+.active-items-preview {
   background: var(--surface-alt);
   border: 1px solid var(--border);
   padding: 8px 12px;
@@ -459,12 +413,8 @@ button.action-btn {
   width: 100%;
   height: 80px;
   background: white;
-  color: var(--text);
-  border: 1px solid #cbd5e1;
   margin-top: 6px;
   margin-bottom: 8px;
-  font-family: var(--font-mono);
-  font-size: 0.85em;
 }
 
 .status-text {
@@ -472,7 +422,7 @@ button.action-btn {
   color: var(--text-soft);
 }
 
-/* ---------------- Grid multi kategori (BAP) ---------------- */
+/* ---------------- Layout BAP ---------------- */
 
 .multi-form-container {
   display: flex;
@@ -517,10 +467,9 @@ button.action-btn {
   }
 }
 
-/* ---------------- Tabel ---------------- */
+/* ---------------- Table ---------------- */
 
-.table-container,
-.table-wrap {
+.table-container {
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -547,38 +496,11 @@ td {
   border-bottom: 1px solid var(--border);
 }
 
-tr:hover {
-  background: var(--surface-alt);
-}
-
-.action-btns button {
-  padding: 3px 8px;
-  font-size: 0.9em;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-right: 2px;
-}
-
-/* ============================================================
-   MENU UTAMA (index.html)
-   ============================================================ */
+/* ---------------- Menu Utama ---------------- */
 
 .menu-header {
   text-align: center;
   margin-bottom: 28px;
-}
-
-.menu-header h1 {
-  font-size: 1.4rem;
-  margin-bottom: 6px;
-  color: var(--text);
-}
-
-.menu-header p {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin: 0;
 }
 
 .menu-grid {
@@ -598,7 +520,6 @@ tr:hover {
   text-decoration: none;
   color: var(--text);
   border: 1px solid var(--border);
-  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
 }
 
 .menu-card:hover {
@@ -608,7 +529,6 @@ tr:hover {
 }
 
 .menu-card .menu-icon {
-  flex: 0 0 auto;
   width: 44px;
   height: 44px;
   border-radius: var(--radius);
@@ -623,19 +543,12 @@ tr:hover {
   flex: 1;
 }
 
-.menu-card .menu-text .menu-title {
+.menu-card .menu-title {
   font-weight: bold;
   font-size: 1rem;
-  margin-bottom: 2px;
 }
 
-.menu-card .menu-text .menu-desc {
+.menu-card .menu-desc {
   font-size: 0.8rem;
   color: var(--text-muted);
-}
-
-.menu-card .menu-arrow {
-  flex: 0 0 auto;
-  color: var(--color-primary);
-  font-size: 1.2rem;
 }
