@@ -1,46 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Utama - Tools Laporan</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="page">
-        <div class="menu-header">
-            <h1>Menu Tools Laporan</h1>
-            <p>Pilih tools yang ingin digunakan</p>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Menu Utama - Tools Laporan</title>
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+      
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="page">
+            <div class="menu-header">
+                <h1>Menu Tools Laporan</h1>
+                <p>Pilih tools yang ingin digunakan</p>
+            </div>
+
+            <div class="menu-grid">
+                <a href="format-pm.html" class="menu-card">
+                    <div class="menu-icon"><i class="material-icons">insert_chart</i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Generator Laporan Sales</div>
+                        <div class="menu-desc">
+                            Input manual per item atau convert dari teks angka
+                            (Sales / Stok)
+                        </div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+
+                <a href="format-so.html" class="menu-card">
+                    <div class="menu-icon"><i class="material-icons">insert_chart</i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Format SO PRODSUS</div>
+                        <div class="menu-desc">
+                            Konversi teks hasil stock opname ke format laporan
+                            siap kirim
+                        </div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+
+                <a href="format-bap.html" class="menu-card">
+                    <div class="menu-icon"><i class="material-icons">insert_chart</i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Generator BAP</div>
+                        <div class="menu-desc">
+                            Input data per kategori (BPB/Sales/BAP) dan susun
+                            laporan permintaan pass BAP
+                        </div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+                <a href="bulk-barcode.html" class="menu-card">
+                    <div class="menu-icon">
+                        <i class="material-icons">insert_chart</i>
+                    </div>
+                    <div class="menu-text">
+                        <div class="menu-title">Bulk Barcode QR</div>
+                        <div class="menu-desc">
+                            Membuat banyak barcode atau QR sekaligus
+                        </div>
+                    </div>
+                    <div class="menu-arrow">›</div>
+                </a>
+            </div>
         </div>
-
-        <div class="menu-grid">
-            <a href="format-pm.html" class="menu-card">
-                <div class="menu-icon">📊</div>
-                <div class="menu-text">
-                    <div class="menu-title">Generator Laporan Sales</div>
-                    <div class="menu-desc">Input manual per item atau convert dari teks angka (target/sales/AKM)</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </a>
-
-            <a href="format-so.html" class="menu-card">
-                <div class="menu-icon">🔁</div>
-                <div class="menu-text">
-                    <div class="menu-title">Format SO PRODSUS</div>
-                    <div class="menu-desc">Konversi teks hasil stock opname ke format laporan siap kirim</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </a>
-
-            <a href="format-bap.html" class="menu-card">
-                <div class="menu-icon">📋</div>
-                <div class="menu-text">
-                    <div class="menu-title">Generator BAP</div>
-                    <div class="menu-desc">Input data per kategori (BPB/Sales/BAP) dan susun laporan permintaan pass BAP</div>
-                </div>
-                <div class="menu-arrow">›</div>
-            </a>
-        </div>
-    </div>
-</body>
+    </body>
 </html>
