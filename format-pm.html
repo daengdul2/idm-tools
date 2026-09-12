@@ -22,7 +22,29 @@
         <button class="tab-btn" data-tab="import" onclick="switchTab('import')">Import dari Teks Laporan</button>
     </div>
 
-    <textarea id="headerText" class="header-input" oninput="saveHeader()">Laporan Penjualan Paling Murah Area HSM 03-09 SEPT 2026&#10;&#10;Kode toko : T7YB&#10;ITEM_TARGET_SALES_ACV_STOK</textarea>
+    <!-- Input Header Terpisah -->
+<div class="header-form-card" style="background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd;">
+    <h3 style="margin-top:0;">Pengaturan Header Laporan</h3>
+    
+    <div style="margin-bottom: 10px;">
+        <label><b>Judul / Teks Header:</b></label>
+        <input type="text" id="headerTitle" class="input-nav" style="width:100%; padding:8px;" oninput="saveHeader()">
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom: 10px;">
+        <div style="flex:1;">
+            <label><b>Periode:</b></label>
+            <input type="text" id="headerPeriod" class="input-nav" placeholder="cth: 10-16 SEPT 2026" style="width:100%; padding:8px;" oninput="saveHeader()">
+        </div>
+        <div style="flex:1;">
+            <label><b>Kode Toko / Detail Toko:</b></label>
+            <input type="text" id="headerStoreCode" class="input-nav" placeholder="cth: T7YB" style="width:100%; padding:8px;" oninput="saveHeader()">
+        </div>
+    </div>
+
+    <button type="button" onclick="restoreDefaultHeader()" style="padding:5px 10px; cursor:pointer;">Reset Header Ke Default</button>
+</div>
+
 
     <!-- TAB 1: FORM INPUT MANUAL -->
     <div id="tabManual" class="tab-content active">

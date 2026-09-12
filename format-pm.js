@@ -1,16 +1,23 @@
+const defaultHeader = {
+    title: "Laporan Penjualan Paling Murah Area HSM",
+    period: "10-16 SEPT 2026",
+    storeCode: "T7YB"
+};
+
 const defaultItems = [
-    { name: "CAPLANG", target: 11 },
-    { name: "CLOSEP UP", target: 10 },
-    { name: "COLLAGENA", target: 22 },
-    { name: "GOOD DAY", target: 8 },
-    { name: "HEAD&SHOUL", target: 4 },
-    { name: "KANZLER", target: 27 },
-    { name: "LEMINERAL", target: 327 },
-    { name: "PANTENE", target: 3 },
-    { name: "PRINGLES", target: 12 },
-    { name: "ROMA", target: 17 },
-    { name: "SEDAP MIE", target: 37 },
-    { name: "SUNLIGHT", target: 34 }
+    { name: "AQUA", target: 94 },
+    { name: "BANGO", target: 10 },
+    { name: "IDM LARRIST TISSUE", target: 17 },
+    { name: "IDM KACANG", target: 13 },
+    { name: "IDM TISSUE", target: 85 },
+    { name: "INDOMILK SKM", target: 26 },
+    { name: "KAHF", target: 4 },
+    { name: "KAHF WARDAH", target: 8 },
+    { name: "LIFEBOY", target: 3 },
+    { name: "LUX", target: 2 },
+    { name: "MY BABY", target: 14 },
+    { name: "TOP COFFE", target: 33 },
+    { name: "WONHAE", target: 19 }
 ];
 
 let items = [];
@@ -18,19 +25,47 @@ let items = [];
 function loadSavedData() {
     items = ambilData("salesReportItems", [...defaultItems]);
 
-    const savedHeader = ambilTeks("salesReportHeader");
+    const savedHeader = ambilData("salesReportHeaderObj", null);
     if (savedHeader) {
-        document.getElementById("headerText").value = savedHeader;
+        document.getElementById("headerTitle").value = savedHeader.title || defaultHeader.title;
+        document.getElementById("headerPeriod").value = savedHeader.period || defaultHeader.period;
+        document.getElementById("headerStoreCode").value = savedHeader.storeCode || defaultHeader.storeCode;
+    } else {
+        restoreDefaultHeader();
     }
+}
+
+function saveHeader() {
+    const headerObj = {
+        title: document.getElementById("headerTitle").value,
+        period: document.getElementById("headerPeriod").value,
+        storeCode: document.getElementById("headerStoreCode").value
+    };
+    simpanData("salesReportHeaderObj", headerObj);
+}
+
+function restoreDefaultHeader() {
+    document.getElementById("headerTitle").value = defaultHeader.title;
+    document.getElementById("headerPeriod").value = defaultHeader.period;
+    document.getElementById("headerStoreCode").value = defaultHeader.storeCode;
+    saveHeader();
+}
+
+function getFullHeaderText() {
+    const title = document.getElementById("headerTitle").value.trim();
+    const period = document.getElementById("headerPeriod").value.trim();
+    const storeCode = document.getElementById("headerStoreCode").value.trim();
+
+    let fullHeader = "";
+    if (title || period) fullHeader += `${title} ${period}`.trim() + "\n\n";
+    if (storeCode) fullHeader += `Kode toko : ${storeCode}\n`;
+    fullHeader += `ITEM_TARGET_SALES_ACV`;
+
+    return fullHeader;
 }
 
 function saveItems() {
     simpanData("salesReportItems", items);
-}
-
-function saveHeader() {
-    const headerVal = document.getElementById("headerText").value;
-    simpanTeks("salesReportHeader", headerVal);
 }
 
 function switchTab(tabName) {
@@ -68,7 +103,7 @@ function renderForm() {
                 </div>
                 <div class="field-group">
                     <label>SALES:</label>
-                    <input type="number" id="sales_${index}" class="input-nav" placeholder="Sales" oninput="calculateAcv(${index})">
+                    <input type="number" id="sales_${index}" class="input-nav" placeholder="Sales" value="${item.sales !== undefined ? item.sales : ''}" oninput="calculateAcv(${index})">
                 </div>
                 <div class="field-group">
                     <label>ACV % (OTOMATIS):</label>
@@ -76,11 +111,12 @@ function renderForm() {
                 </div>
                 <div class="field-group">
                     <label>STOK (OPSIONAL):</label>
-                    <input type="number" id="stok_${index}" class="input-nav" placeholder="Stok">
+                    <input type="number" id="stok_${index}" class="input-nav" placeholder="Stok" value="${item.stok !== undefined ? item.stok : ''}">
                 </div>
             </div>
         `;
         container.appendChild(card);
+        calculateAcv(index);
     });
 
     setupEnterNavigation();
@@ -96,13 +132,17 @@ function calculateAcv(index) {
     const salesVal = parseFloat(document.getElementById(`sales_${index}`).value) || 0;
     const acvInput = document.getElementById(`acv_${index}`);
 
+    let acvPercent = 0;
     if (targetVal > 0) {
-        const acv = Math.round((salesVal / targetVal) * 100);
-        acvInput.value = `${acv}%`;
-    } else {
-        acvInput.value = "0%";
+        acvPercent = Math.round((salesVal / targetVal) * 100);
     }
 
+    let acvText = `${acvPercent}%`;
+    if (acvPercent >= 100) {
+        acvText += "✅";
+    }
+
+    acvInput.value = acvText;
     items[index].target = targetVal;
     saveItems();
 }
@@ -125,7 +165,7 @@ function setupEnterNavigation() {
 }
 
 function addItem() {
-    items.push({ name: "ITEM BARU", target: 0 });
+    items.push({ name: "ITEM BARU", target: 0, sales: 0, stok: "" });
     saveItems();
     renderForm();
     const lastIndex = items.length - 1;
@@ -141,7 +181,7 @@ function deleteItem(index) {
 }
 
 function restoreDefaultItems() {
-    if (confirm("Kembalikan daftar item ke susunan awal/default? Semua perubahan item kustom akan diset ulang.")) {
+    if (confirm("Kembalikan daftar item ke susunan awal/default?")) {
         items = JSON.parse(JSON.stringify(defaultItems));
         saveItems();
         renderForm();
@@ -162,7 +202,7 @@ function formatRow(index, name, target, sales, acv, stok) {
 }
 
 function generateReport() {
-    const header = document.getElementById("headerText").value;
+    const header = getFullHeaderText();
     let result = `${header}\n\n`;
 
     items.forEach((item, index) => {
@@ -189,17 +229,19 @@ function convertTextToReport() {
     const salesArray = parts[0].trim().split(/\s+/).map(Number);
     const stokArray = parts[1] ? parts[1].trim().split(/\s+/).map(v => v.trim()) : [];
 
-    const header = document.getElementById("headerText").value;
+    const header = getFullHeaderText();
     let result = `${header}\n\n`;
 
     items.forEach((item, index) => {
         const sales = salesArray[index] !== undefined && !isNaN(salesArray[index]) ? salesArray[index] : 0;
         const stok = stokArray[index] !== undefined ? stokArray[index] : "";
         
-        let acv = "0%";
+        let acvPercent = 0;
         if (item.target > 0) {
-            acv = `${Math.round((sales / item.target) * 100)}%`;
+            acvPercent = Math.round((sales / item.target) * 100);
         }
+        let acv = `${acvPercent}%`;
+        if (acvPercent >= 100) acv += "✅";
 
         result += `${formatRow(index, item.name.toUpperCase(), item.target || 0, sales, acv, stok)}\n`;
     });
@@ -208,26 +250,59 @@ function convertTextToReport() {
 }
 
 function parseReportText(text) {
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    let headerLines = [];
+    // Bersihkan karakter tersembunyi seperti Left-to-Right Mark (\u200e)
+    const cleanText = text.replace(/[\u200B-\u200D\uFEFF\u200E\u200F]/g, "");
+    const lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    
+    let headerInfo = {
+        title: "",
+        period: "",
+        storeCode: ""
+    };
     const parsedItems = [];
 
     lines.forEach(line => {
-        // Format baris: 1. NAMA_TARGET_SALES_ACV%_STOK atau tanpa stok
-        const match = line.match(/^\d+\.\s*(.+?)_(\d+)_(\d+)_(\d+%)?(?:_(\d+))?$/);
+        // Cek pola baris item: 
+        // 1. NAMA_TARGET_SALES_ACV%
+        // 2. NAMA_TARGET_SALES_TERJUAL_ACV%
+        // 3. NAMA_TARGET_SALES_ACV%_STOK
+        const itemRegex = /^(?:\d+\.\s*)?(.+?)_(\d+)_(\d+)(?:_(\d+))?_(\d+%)?(?:✅)?(?:_(\d+))?$/;
+        const match = line.match(itemRegex);
+
         if (match) {
-            parsedItems.push({
-                name: match[1].trim(),
-                target: parseFloat(match[2]) || 0,
-                sales: parseFloat(match[3]) || 0,
-                stok: match[5] !== undefined ? match[5] : ""
-            });
+            const name = match[1].trim();
+            const target = parseFloat(match[2]) || 0;
+            let sales = parseFloat(match[3]) || 0;
+            let stok = "";
+
+            if (match[6] !== undefined) {
+                stok = match[6];
+            } else if (match[4] !== undefined && match[5] === undefined) {
+                // Jika ada 4 angka tanpa lambang % di pertengahan
+                sales = parseFloat(match[4]) || 0;
+            }
+
+            parsedItems.push({ name, target, sales, stok });
         } else {
-            headerLines.push(line);
+            // Deteksi baris header
+            if (line.toLowerCase().includes("laporan penjualan")) {
+                const parts = line.split(/(?=\d{1,2}-\d{1,2})/);
+                if (parts.length > 1) {
+                    headerInfo.title = parts[0].trim();
+                    headerInfo.period = parts.slice(1).join("").trim();
+                } else {
+                    headerInfo.title = line;
+                }
+            } else if (line.toLowerCase().includes("kode toko")) {
+                const codeMatch = line.match(/kode toko\s*:\s*(.*)/i);
+                if (codeMatch) {
+                    headerInfo.storeCode = codeMatch[1].trim();
+                }
+            }
         }
     });
 
-    return { header: headerLines.join('\n'), parsedItems };
+    return { headerInfo, parsedItems };
 }
 
 function importFromReportText() {
@@ -237,36 +312,35 @@ function importFromReportText() {
         return;
     }
 
-    const { header, parsedItems } = parseReportText(text);
+    const { headerInfo, parsedItems } = parseReportText(text);
 
     if (parsedItems.length === 0) {
-        alert("Tidak ada item yang terdeteksi. Periksa kembali format teks laporan.\n\nContoh format:\n1. CAPLANG_11_1_9%_1");
+        alert("Tidak ada item yang terdeteksi. Periksa kembali format teks laporan.");
         return;
     }
 
-    const konfirmasi = confirm(`Terdeteksi ${parsedItems.length} item dari teks laporan.\n\nIni akan MENGGANTI daftar item dan nilai yang ada. Lanjutkan?`);
+    const konfirmasi = confirm(`Terdeteksi ${parsedItems.length} item dari teks laporan.\n\nLanjutkan import ke form?`);
     if (!konfirmasi) return;
 
-    if (header) {
-        document.getElementById("headerText").value = header;
-        saveHeader();
-    }
+    if (headerInfo.title) document.getElementById("headerTitle").value = headerInfo.title;
+    if (headerInfo.period) document.getElementById("headerPeriod").value = headerInfo.period;
+    if (headerInfo.storeCode) document.getElementById("headerStoreCode").value = headerInfo.storeCode;
+    saveHeader();
 
-    items = parsedItems.map(p => ({ name: p.name, target: p.target }));
+    items = parsedItems.map(p => ({
+        name: p.name,
+        target: p.target,
+        sales: p.sales,
+        stok: p.stok
+    }));
+    
     saveItems();
     renderForm();
 
-    parsedItems.forEach((p, index) => {
-        const salesInput = document.getElementById(`sales_${index}`);
-        const stokInput = document.getElementById(`stok_${index}`);
-        if (salesInput) salesInput.value = p.sales;
-        if (stokInput) stokInput.value = p.stok;
-        calculateAcv(index);
-    });
-
     document.getElementById("importInput").value = "";
     switchTab('manual');
-    alert("Import berhasil! Data telah diisi ke form Input/Pengaturan Item.");
+    generateReport();
+    alert("Import berhasil!");
 }
 
 function copyReport(targetId) {
@@ -277,14 +351,15 @@ function copyReport(targetId) {
 
 function resetForm() {
     if (confirm("Kosongkan nilai Sales dan Stok?")) {
-        items.forEach((_, index) => {
+        items.forEach((item, index) => {
+            item.sales = "";
+            item.stok = "";
             document.getElementById(`sales_${index}`).value = "";
             document.getElementById(`stok_${index}`).value = "";
             document.getElementById(`acv_${index}`).value = "0%";
         });
+        saveItems();
         document.getElementById("outputManual").value = "";
-        const firstSales = document.getElementById("sales_0");
-        if (firstSales) firstSales.focus();
     }
 }
 
