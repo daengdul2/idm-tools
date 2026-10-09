@@ -5,19 +5,20 @@ const defaultHeader = {
 };
 
 const defaultItems = [
-    { name: "AQUA", target: 94 },
-    { name: "BANGO", target: 10 },
-    { name: "IDM LARRIST TISSUE", target: 17 },
-    { name: "IDM KACANG", target: 13 },
-    { name: "IDM TISSUE", target: 85 },
-    { name: "INDOMILK SKM", target: 26 },
-    { name: "KAHF", target: 4 },
-    { name: "KAHF WARDAH", target: 8 },
-    { name: "LIFEBOY", target: 3 },
-    { name: "LUX", target: 2 },
-    { name: "MY BABY", target: 14 },
-    { name: "TOP COFFE", target: 33 },
-    { name: "WONHAE", target: 19 }
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    { name: "", target: 0},
+    
 ];
 
 let items = [];

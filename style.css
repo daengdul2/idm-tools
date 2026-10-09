@@ -189,6 +189,16 @@ textarea {
   align-items: center;
 }
 
+.input{
+  flex: 2;
+  font-weight: bold;
+  color: var(--text);
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+  margin-bottom: 5px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
 .input-item-name {
   flex: 2;
   font-weight: bold;
