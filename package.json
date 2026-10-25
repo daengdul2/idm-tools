@@ -1,13 +1,15 @@
 {
-  "name": "share",
-  "version": "1.0.0",
-  "description": "File manager lokal dengan kumpulan tool laporan toko",
+  "name": "idm-tools",
+  "version": "1.0.1",
+  "description": "Read-only file portal optimized for Vercel serverless",
   "private": true,
+  "type": "commonjs",
   "scripts": {
     "start": "node server.js"
   },
-  "license": "ISC",
-  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "express": "^5.2.1"
   }

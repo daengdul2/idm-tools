@@ -5,105 +5,131 @@ const path = require('path');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 8000;
+const ROOT_DIR = process.cwd();
+const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
+const PROJECTS_DIR = path.join(ROOT_DIR, 'projects');
 
-const PUBLIC_DIR = path.join(process.cwd(), 'public');
-const PROJECTS_DIR = path.join(process.cwd(), 'projects');
-
-// Nama yang disembunyikan dari daftar dan diblokir dari akses
 const HIDDEN = new Set(['node_modules', '.git', '.DS_Store']);
-
-// Batas ukuran file teks yang boleh di-preview (1 MB)
 const MAX_TEXT_BYTES = 1024 * 1024;
 
-//fs.mkdirSync(PROJECTS_DIR, { recursive: true });
-
-/* ---------- Helper ---------- */
-
-// Rapikan path relatif dari query: "a//b/./c" -> "a/b/c"
 function normalizeRel(input) {
-  return String(input || '')
-    .replace(/\\/g, '/')
-    .split('/')
-    .filter((seg) => seg && seg !== '.')
-    .join('/');
+  // Reject arrays/objects and null bytes rather than coercing arbitrary input.
+  if (typeof input !== 'string') return '';
+  return input.replace(/\\/g, '/').split('/').filter((seg) => seg && seg !== '.').join('/');
 }
 
-// Resolusi path aman: hasil harus tetap berada di dalam PROJECTS_DIR
+function hasHiddenSegment(relPath) {
+  return relPath.split('/').some((seg) => HIDDEN.has(seg));
+}
+
 function resolveSafe(relPath) {
   const target = path.resolve(PROJECTS_DIR, relPath);
   if (target !== PROJECTS_DIR && !target.startsWith(PROJECTS_DIR + path.sep)) return null;
   return target;
 }
 
-const hasHiddenSegment = (relPath) => relPath.split('/').some((seg) => HIDDEN.has(seg));
-const toUrl = (relPath) => '/projects/' + relPath.split('/').map(encodeURIComponent).join('/');
+// Prevent symlinks inside projects from exposing files outside the projects root.
+async function resolveExistingSafe(relPath) {
+  const target = resolveSafe(relPath);
+  if (!target) return null;
+  const [realRoot, realTarget] = await Promise.all([
+    fsp.realpath(PROJECTS_DIR),
+    fsp.realpath(target),
+  ]);
+  if (realTarget !== realRoot && !realTarget.startsWith(realRoot + path.sep)) return null;
+  return realTarget;
+}
+
+const toUrl = (relPath) =>
+  '/projects/' + relPath.split('/').map(encodeURIComponent).join('/');
 const isIndexFile = (name) => !name.startsWith('.') && name.toLowerCase().startsWith('index.');
 
 function sendFsError(res, err) {
-  if (err.code === 'ENOENT') return res.status(404).json({ error: 'Folder atau file tidak ditemukan.' });
-  if (err.code === 'ENOTDIR') return res.status(400).json({ error: 'Path ini bukan folder.' });
-  if (err.code === 'EACCES') return res.status(403).json({ error: 'Tidak punya izin untuk membuka ini.' });
+  if (err.code === 'ENOENT' || err.code === 'ENOTDIR') {
+    return res.status(err.code === 'ENOTDIR' ? 400 : 404).json({
+      error: err.code === 'ENOTDIR' ? 'Path ini bukan folder.' : 'Folder atau file tidak ditemukan.',
+    });
+  }
+  if (err.code === 'EACCES' || err.code === 'EPERM') {
+    return res.status(403).json({ error: 'Tidak punya izin untuk membuka ini.' });
+  }
+  console.error('Filesystem error:', err);
   return res.status(500).json({ error: 'Terjadi kesalahan saat membaca.' });
 }
 
-/* ---------- File statis ---------- */
+// Public assets are normally served directly by Vercel when present in /public.
+// This middleware is also useful for local development.
+app.use(express.static(PUBLIC_DIR, { fallthrough: true, index: 'index.html' }));
 
-// Portal (index.html) dan aset bersama (/assets/theme.css, /assets/common.js, /assets/lib/*)
-app.use(express.static(PUBLIC_DIR));
-
-// Blokir akses langsung ke folder tersembunyi (mis. .git) lewat URL
+// Check URL-encoded project paths before serving them.
 app.use('/projects', (req, res, next) => {
+  let decoded;
   try {
-    if (hasHiddenSegment(normalizeRel(decodeURIComponent(req.path)))) {
-      return res.status(403).send('Akses ditolak.');
-    }
-    next();
+    decoded = decodeURIComponent(req.path);
   } catch {
-    res.status(400).send('URL tidak valid.');
+    return res.status(400).send('URL tidak valid.');
+  }
+
+  const relPath = normalizeRel(decoded);
+  if (hasHiddenSegment(relPath)) return res.status(403).send('Akses ditolak.');
+  next();
+});
+
+// Serve only files whose resolved targets remain inside PROJECTS_DIR.
+app.use('/projects', async (req, res, next) => {
+  try {
+    const relPath = normalizeRel(decodeURIComponent(req.path));
+    if (!relPath || hasHiddenSegment(relPath)) return next();
+
+    const safeTarget = await resolveExistingSafe(relPath);
+    if (!safeTarget) return res.status(403).send('Akses ditolak.');
+
+    // Send the resolved path directly; avoid following a symlink after validation.
+    return res.sendFile(safeTarget, { dotfiles: 'deny' }, (err) => {
+      if (err && !res.headersSent) {
+        if (err.status === 404) return res.status(404).send('File tidak ditemukan.');
+        return next(err);
+      }
+    });
+  } catch (err) {
+    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return next();
+    return next(err);
   }
 });
 
-// Akses langsung ke file project (membuka .html, gambar, dll.)
-app.use('/projects', express.static(PROJECTS_DIR));
-
-/* ---------- API ---------- */
-
-// Daftar isi folder
+// List a directory.
 app.get('/api/files', async (req, res) => {
   const relPath = normalizeRel(req.query.path);
-  const dir = resolveSafe(relPath);
-
-  if (!dir || hasHiddenSegment(relPath)) {
-    return res.status(403).json({ error: 'Akses ditolak.' });
-  }
+  if (hasHiddenSegment(relPath)) return res.status(403).json({ error: 'Akses ditolak.' });
 
   try {
-    const entries = await fsp.readdir(dir, { withFileTypes: true });
+    const dir = await resolveExistingSafe(relPath);
+    if (!dir) return res.status(403).json({ error: 'Akses ditolak.' });
 
-    // File index di folder saat ini (untuk tombol "Buka Index" di breadcrumb)
+    const dirStat = await fsp.stat(dir);
+    if (!dirStat.isDirectory()) return res.status(400).json({ error: 'Path ini bukan folder.' });
+
+    const entries = await fsp.readdir(dir, { withFileTypes: true });
     const indexEntry = entries.find((e) => !e.isDirectory() && isIndexFile(e.name));
     const indexUrl = indexEntry ? toUrl(relPath ? `${relPath}/${indexEntry.name}` : indexEntry.name) : null;
 
-    const items = (await Promise.all(
-      entries
-        .filter((e) => !HIDDEN.has(e.name))
-        .map(async (e) => {
-          let st;
-          try {
-            st = await fsp.stat(path.join(dir, e.name)); // ikut symlink
-          } catch {
-            return null; // lewati symlink rusak / tidak terbaca
-          }
-          const isDir = st.isDirectory();
-          const itemRel = relPath ? `${relPath}/${e.name}` : e.name;
+    const items = (await Promise.all(entries
+      .filter((e) => !HIDDEN.has(e.name))
+      .map(async (e) => {
+        const itemRel = relPath ? `${relPath}/${e.name}` : e.name;
+        if (hasHiddenSegment(itemRel)) return null;
 
-          // Folder yang berisi index.* bisa langsung dibuka sebagai aplikasi
+        try {
+          const safeItem = await resolveExistingSafe(itemRel);
+          if (!safeItem) return null;
+          const st = await fsp.stat(safeItem);
+          const isDir = st.isDirectory();
           let subIndexUrl = null;
+
           if (isDir) {
-            try {
-              const sub = (await fsp.readdir(path.join(dir, e.name))).find(isIndexFile);
-              if (sub) subIndexUrl = toUrl(`${itemRel}/${sub}`);
-            } catch { /* folder tidak terbaca: abaikan */ }
+            const subEntries = await fsp.readdir(safeItem, { withFileTypes: true });
+            const subIndex = subEntries.find((entry) => !entry.isDirectory() && isIndexFile(entry.name));
+            if (subIndex) subIndexUrl = toUrl(`${itemRel}/${subIndex.name}`);
           }
 
           return {
@@ -115,66 +141,72 @@ app.get('/api/files', async (req, res) => {
             url: toUrl(itemRel),
             indexUrl: subIndexUrl,
           };
-        })
-    )).filter(Boolean);
+        } catch {
+          return null;
+        }
+      }))).filter(Boolean);
 
-    // Folder dulu, lalu urut nama
     items.sort((a, b) => {
       if (a.isDir !== b.isDir) return a.isDir ? -1 : 1;
       return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
     });
 
-    res.json({ currentPath: relPath, items, indexUrl });
+    return res.json({ currentPath: relPath, items, indexUrl });
   } catch (err) {
-    sendFsError(res, err);
+    return sendFsError(res, err);
   }
 });
 
-// Baca isi file teks untuk preview
+// Read a bounded amount of a text file.
 app.get('/api/read', async (req, res) => {
   const relPath = normalizeRel(req.query.path);
-  const file = resolveSafe(relPath);
-
-  if (!relPath || !file || hasHiddenSegment(relPath)) {
+  if (!relPath || hasHiddenSegment(relPath)) {
     return res.status(403).json({ error: 'Akses ditolak.' });
   }
 
+  let handle;
   try {
+    const file = await resolveExistingSafe(relPath);
+    if (!file) return res.status(403).json({ error: 'Akses ditolak.' });
+
     const st = await fsp.stat(file);
-    if (st.isDirectory()) return res.status(400).json({ error: 'Ini adalah folder, bukan file.' });
+    if (!st.isFile()) return res.status(400).json({ error: 'Ini adalah folder, bukan file.' });
 
     const len = Math.min(st.size, MAX_TEXT_BYTES);
+    handle = await fsp.open(file, 'r');
     const buf = Buffer.alloc(len);
-    const fh = await fsp.open(file, 'r');
-    try {
-      await fh.read(buf, 0, len, 0);
-    } finally {
-      await fh.close();
-    }
+    if (len > 0) await handle.read(buf, 0, len, 0);
 
-    // File biner mengandung byte NULL -> tidak bisa ditampilkan sebagai teks
     if (buf.includes(0)) return res.status(415).json({ error: 'File ini bukan file teks.' });
 
-    res.json({ content: buf.toString('utf8'), size: st.size, truncated: st.size > MAX_TEXT_BYTES });
+    return res.json({
+      content: buf.toString('utf8'),
+      size: st.size,
+      truncated: st.size > MAX_TEXT_BYTES,
+    });
   } catch (err) {
-    sendFsError(res, err);
+    return sendFsError(res, err);
+  } finally {
+    if (handle) await handle.close().catch(() => {});
   }
 });
 
-//  app.listen(PORT, () => {
-//  console.log(`🚀 File Manager berjalan di http://localhost:${PORT}`);
-//  console.log(`📁 Menampilkan direktori: ${PROJECTS_DIR}`);
-// });
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true, storage: 'deployment-files-read-only' });
+});
 
+// Express 5 / Vercel error handler.
+app.use((err, _req, res, _next) => {
+  console.error('Request error:', err);
+  if (res.headersSent) return;
+  res.status(500).json({ error: 'Terjadi kesalahan pada server.' });
+});
 
-// Hapus atau bungkus app.listen agar tidak error di serverless
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`🚀 File Manager berjalan di http://localhost:${PORT}`);
-    console.log(`📁 Menampilkan direktori: ${PROJECTS_DIR}`);
+    console.log(`File Manager berjalan di http://localhost:${PORT}`);
+    console.log(`Direktori proyek: ${PROJECTS_DIR}`);
   });
 }
 
-// Wajib diekspor agar bisa dibaca oleh Vercel Serverless
 module.exports = app;
-
