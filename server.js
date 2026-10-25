@@ -161,7 +161,20 @@ app.get('/api/read', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 File Manager berjalan di http://localhost:${PORT}`);
-  console.log(`📁 Menampilkan direktori: ${PROJECTS_DIR}`);
-});
+//  app.listen(PORT, () => {
+//  console.log(`🚀 File Manager berjalan di http://localhost:${PORT}`);
+//  console.log(`📁 Menampilkan direktori: ${PROJECTS_DIR}`);
+// });
+
+
+// Hapus atau bungkus app.listen agar tidak error di serverless
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 File Manager berjalan di http://localhost:${PORT}`);
+    console.log(`📁 Menampilkan direktori: ${PROJECTS_DIR}`);
+  });
+}
+
+// Wajib diekspor agar bisa dibaca oleh Vercel Serverless
+module.exports = app;
+
