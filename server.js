@@ -6,8 +6,8 @@ const path = require('path');
 const app = express();
 const PORT = Number(process.env.PORT) || 8000;
 
-const PUBLIC_DIR = path.join(__dirname, 'public');      // portal + aset bersama (tema, library)
-const PROJECTS_DIR = path.join(__dirname, 'projects');  // folder yang ditampilkan file manager
+const PUBLIC_DIR = path.join(process.cwd(), 'public');
+const PROJECTS_DIR = path.join(process.cwd(), 'projects');
 
 // Nama yang disembunyikan dari daftar dan diblokir dari akses
 const HIDDEN = new Set(['node_modules', '.git', '.DS_Store']);
@@ -15,7 +15,7 @@ const HIDDEN = new Set(['node_modules', '.git', '.DS_Store']);
 // Batas ukuran file teks yang boleh di-preview (1 MB)
 const MAX_TEXT_BYTES = 1024 * 1024;
 
-fs.mkdirSync(PROJECTS_DIR, { recursive: true });
+//fs.mkdirSync(PROJECTS_DIR, { recursive: true });
 
 /* ---------- Helper ---------- */
 
