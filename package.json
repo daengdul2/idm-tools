@@ -1,0 +1,14 @@
+{
+  "name": "share",
+  "version": "1.0.0",
+  "description": "File manager lokal dengan kumpulan tool laporan toko",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

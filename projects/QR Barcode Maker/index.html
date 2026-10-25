@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barcode &amp; QR Generator</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page" style="max-width:500px">
+    <div class="app-nav">
+      <a href="/" class="back-link">← Menu</a>
+      <span class="app-name">QR &amp; Barcode</span>
+    </div>
+
+    <div class="card">
+      <h2 class="page-title">Barcode &amp; QR Generator</h2>
+
+      <div class="preview">
+        <svg id="barcode" class="hidden"></svg>
+        <div id="qrcode" class="hidden"></div>
+      </div>
+      <button id="downloadBtn" class="btn btn-ghost btn-block hidden" style="margin-bottom:14px">Download</button>
+
+      <div class="field">
+        <label for="textInput">PLU</label>
+        <input type="text" id="textInput" placeholder="Masukkan PLU" maxlength="40">
+      </div>
+      <div class="field">
+        <label for="amountInput">Jumlah</label>
+        <input type="number" id="amountInput" inputmode="numeric" placeholder="Masukkan jumlah" value="0">
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="toggleSlider">
+        <span>Tampilkan pengaturan barcode</span>
+      </label>
+
+      <div id="sliderSection" class="hidden">
+        <div class="field">
+          <label for="barcodeHeight">Tinggi barcode: <span id="heightValue">100</span> px</label>
+          <input type="range" id="barcodeHeight" min="50" max="200" value="100">
+        </div>
+        <div class="field">
+          <label for="barcodeWidth">Ketebalan garis: <span id="widthValue">2</span></label>
+          <input type="range" id="barcodeWidth" min="1" max="10" value="2">
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-bottom:0">
+        <button id="barcodeBtn" class="btn">Barcode</button>
+        <button id="qrBtn" class="btn btn-success">QR Code</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/lib/JsBarcode.all.min.js"></script>
+  <script src="/assets/lib/qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

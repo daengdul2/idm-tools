@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Laporan Sales</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="app-nav">
+      <a href="/" class="back-link">← Menu</a>
+      <span class="app-name">Laporan Sales</span>
+    </div>
+
+    <h2 class="page-title">Generator Laporan Sales</h2>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="manual">Input / Item</button>
+      <button class="tab-btn" data-tab="convert">Convert Teks</button>
+      <button class="tab-btn" data-tab="import">Import Laporan</button>
+    </div>
+
+    <div class="card">
+      <h3>Pengaturan Header Laporan</h3>
+      <div class="field">
+        <label for="headerTitle">Judul / Teks Header</label>
+        <input type="text" id="headerTitle">
+      </div>
+      <div class="field-grid" style="margin-bottom:12px">
+        <div class="field">
+          <label for="headerPeriod">Periode</label>
+          <input type="text" id="headerPeriod" placeholder="cth: 10-16 SEPT 2026">
+        </div>
+        <div class="field">
+          <label for="headerStoreCode">Kode Toko</label>
+          <input type="text" id="headerStoreCode" placeholder="cth: T7YB">
+        </div>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnResetHeader">Reset Header ke Default</button>
+    </div>
+
+    <!-- TAB: INPUT -->
+    <section id="tab-manual" class="tab-panel active">
+      <div id="itemsContainer"></div>
+      <button class="btn btn-soft btn-block" id="btnAddItem" style="margin-bottom:12px">+ Tambah Item Baru</button>
+
+      <div class="btn-row">
+        <button class="btn" id="btnGenerate">Buat Teks</button>
+        <button class="btn btn-success" id="btnCopyManual">Salin Teks</button>
+        <button class="btn btn-danger" id="btnResetForm">Reset Input</button>
+      </div>
+      <button class="btn btn-ghost btn-block btn-sm" id="btnRestoreItems">Reset Pengaturan Item ke Default</button>
+      <textarea id="outputManual" class="output" readonly placeholder="Hasil format laporan akan muncul di sini..."></textarea>
+    </section>
+
+    <!-- TAB: CONVERT -->
+    <section id="tab-convert" class="tab-panel">
+      <div class="card">
+        <div class="hint">
+          <strong>Format teks:</strong> masukkan deretan angka sales dan stok dipisah garis miring (<code>/</code>).
+          Jika stok tidak ada, cukup ketik angka sales saja.<br>
+          <em>Contoh:</em> <code>11 10 22 8 4 27 / 1 2 9 6 0 27</code>
+        </div>
+        <p class="note" id="itemsPreview"></p>
+        <div class="field">
+          <label for="rawInput">Tempel teks angka di sini</label>
+          <textarea id="rawInput" placeholder="Masukkan angka sales / stok..."></textarea>
+        </div>
+        <div class="btn-row" style="margin-bottom:0">
+          <button class="btn" id="btnConvert">Convert ke Laporan</button>
+          <button class="btn btn-success" id="btnCopyConvert">Salin Teks</button>
+        </div>
+      </div>
+      <textarea id="outputConvert" class="output" readonly placeholder="Hasil convert laporan akan muncul di sini..."></textarea>
+    </section>
+
+    <!-- TAB: IMPORT -->
+    <section id="tab-import" class="tab-panel">
+      <div class="card">
+        <div class="hint">
+          <strong>Format teks:</strong> tempel seluruh teks laporan.<br>
+          <em>Contoh:</em><br>
+          <code>Laporan Penjualan Paling Murah Area HSM 03-09 SEPT 2026<br>
+          Kode toko : T7YB<br>
+          ITEM_TARGET_SALES_ACV_STOK<br>
+          1. CAPLANG_11_1_9%_1<br>
+          2. CLOSEP UP_10_2_20%_2</code>
+        </div>
+        <div class="field">
+          <label for="importInput">Tempel teks laporan di sini</label>
+          <textarea id="importInput" placeholder="Tempel teks laporan lengkap di sini..."></textarea>
+        </div>
+        <button class="btn btn-block" id="btnImport">Import &amp; Isi Form</button>
+      </div>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

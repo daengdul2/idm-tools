@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk Barcode Generator</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page-wide">
+    <div class="app-nav no-print">
+      <a href="/" class="back-link">← Menu</a>
+      <span class="app-name">Bulk Barcode</span>
+    </div>
+
+    <div class="no-print">
+      <h1 class="page-title">Bulk Barcode Generator</h1>
+      <p class="page-sub">Buat banyak barcode sekaligus, lengkap dengan keterangan di bawah tiap barcode.</p>
+
+      <div class="card">
+        <div class="field">
+          <label for="input">Data barcode (satu baris = satu barcode)</label>
+          <textarea id="input" style="min-height:140px" placeholder="8991234567890, Kopi Sachet 20gr&#10;8991234567891, Teh Celup Isi 25&#10;8991234567892, Gula Pasir 1kg"></textarea>
+        </div>
+        <p class="note" style="margin:-4px 0 12px">Format: <b>kode, keterangan</b> — pisahkan dengan koma. Keterangan opsional; jika kosong hanya kode yang ditampilkan.</p>
+
+        <div class="row" style="margin-bottom:14px">
+          <div class="field">
+            <label for="format">Format barcode</label>
+            <select id="format">
+              <option value="CODE128">CODE128 (umum, bebas karakter)</option>
+              <option value="EAN13">EAN-13 (13 digit angka)</option>
+              <option value="EAN8">EAN-8 (8 digit angka)</option>
+              <option value="UPC">UPC-A (12 digit angka)</option>
+              <option value="CODE39">CODE39</option>
+              <option value="ITF14">ITF-14 (14 digit angka)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="lineWidth">Lebar garis</label>
+            <input type="number" id="lineWidth" value="2" min="1" max="5" step="0.5">
+          </div>
+          <div class="field">
+            <label for="barHeight">Tinggi barcode</label>
+            <input type="number" id="barHeight" value="60" min="30" max="150" step="5">
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-bottom:0">
+          <button class="btn" id="btnGenerate">Generate Barcode</button>
+          <button class="btn btn-ghost" id="btnSample">Isi Contoh</button>
+        </div>
+        <div id="errorBox"></div>
+      </div>
+    </div>
+
+    <div class="card" id="resultCard">
+      <h3 class="card-title no-print">Hasil</h3>
+      <div class="btn-row no-print hidden" id="exportBtns" >
+        <button class="btn btn-ghost" id="btnPrint">🖨️ Print</button>
+        <button class="btn btn-ghost" id="btnPdf">⬇️ Simpan PDF</button>
+        <button class="btn btn-ghost" id="btnPng">⬇️ Simpan PNG (per barcode)</button>
+      </div>
+      <div id="grid" class="barcode-grid" style="height: 10em;">
+        <div class="empty">Belum ada barcode. Masukkan data lalu klik Generate.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/lib/JsBarcode.all.min.js"></script>
+  <script src="/assets/lib/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

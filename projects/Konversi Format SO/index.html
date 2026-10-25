@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konversi Format SO Prodsus</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="app-nav">
+      <a href="/" class="back-link">← Menu</a>
+      <span class="app-name">Format SO Prodsus</span>
+    </div>
+
+    <h2 class="page-title">Konversi Format SO Prodsus</h2>
+
+    <div class="card">
+      <div class="field">
+        <label for="inputText">Teks asli</label>
+        <textarea id="inputText" placeholder="contoh:&#10;SAY BREAD&#10;20087465, SOSIS 4/3&#10;20090979, CHOCO STRIPE 4/0"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="btnConvert">Konversi Format</button>
+        <button class="btn btn-success" id="btnCopy">Salin Hasil</button>
+      </div>
+
+      <div class="field">
+        <label for="outputText">Hasil konversi</label>
+        <textarea id="outputText" readonly></textarea>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

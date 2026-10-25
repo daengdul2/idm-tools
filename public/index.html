@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Manager</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page-xl">
+    <header class="portal-head">
+      <div class="brand">
+        <div class="brand-icon" id="brandIcon"></div>
+        <div>
+          <h1>Project Manager</h1>
+          <p>File manager lokal</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="Cari di folder ini..." aria-label="Cari">
+        <select id="sortSelect" aria-label="Urutkan">
+          <option value="name">Urut: Nama</option>
+          <option value="size">Urut: Ukuran</option>
+          <option value="date">Urut: Terbaru</option>
+        </select>
+        <button id="viewToggle" class="btn btn-ghost btn-icon" title="Ganti tampilan"></button>
+        <button id="refreshBtn" class="btn btn-ghost btn-icon" title="Refresh"></button>
+        <button id="themeBtn" class="btn btn-ghost btn-icon" title="Ganti tema terang/gelap"></button>
+      </div>
+    </header>
+
+    <nav class="crumbs-bar">
+      <button id="upBtn" class="btn btn-ghost btn-icon" title="Naik satu folder"></button>
+      <div id="breadcrumb" class="crumbs"></div>
+      <span id="indexAction"></span>
+      <span id="itemCount" class="count"></span>
+    </nav>
+
+    <div id="fileContainer"></div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box modal-xl">
+      <div class="modal-head">
+        <h3 id="modalTitle"></h3>
+        <a id="modalNewTab" target="_blank" class="btn btn-ghost btn-icon" title="Buka di tab baru"></a>
+        <a id="modalDownload" class="btn btn-ghost btn-icon" title="Unduh"></a>
+        <button id="modalClose" class="btn btn-ghost btn-icon" title="Tutup (Esc)"></button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="/assets/portal.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Generator Laporan Item</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="app-nav">
+      <a href="/" class="back-link">← Menu</a>
+      <span class="app-name">Laporan Item</span>
+    </div>
+
+    <h2 class="page-title">Generator Laporan Item</h2>
+
+    <div class="card">
+      <div class="field">
+        <label for="mode">Format laporan</label>
+        <select id="mode">
+          <option value="1">Format 1: TOKO + Item/Target/Sales/Akm/Acv</option>
+          <option value="2">Format 2: Mingguan (ITEM_TARGET_SALES_AKM_ACV)</option>
+        </select>
+      </div>
+      <div id="f1" class="field" style="margin-bottom:0">
+        <label for="store">Nama toko</label>
+        <input id="store" value="T7YB CABENGE SOPPENG">
+      </div>
+      <div id="f2" class="hidden">
+        <div class="field">
+          <label for="title">Judul laporan</label>
+          <input id="title" value="Laporan Penjualan Paling Murah Area HSM 22 - 28 OKT 2026">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label for="kode">Kode toko</label>
+          <input id="kode" value="T7YB">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Tambah Item Massal</h3>
+      <textarea id="bulk" placeholder="*BANGO=11/2/2/18*&#10;CRISTALIN=100/13/13&#10;SNICKERS=45/sk/sk"></textarea>
+      <p class="note">Format: NAMA=target/sales/akm atau NAMA_target_sales_akm_acv (nomor di depan boleh ada). Bintang (*) dan angka Acv di belakang diabaikan (Acv dihitung otomatis). Nama yang sudah ada akan diperbarui.</p>
+      <button class="btn" id="bBulk" style="margin-top:8px">Tambahkan</button>
+      <div class="msg" id="mBulk"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Tambah Item Satuan</h3>
+      <div class="row">
+        <div class="field" style="flex:2 1 160px"><input id="sN" placeholder="Nama item" aria-label="Nama item"></div>
+        <div class="field"><input id="sT" placeholder="Target" inputmode="numeric" aria-label="Target"></div>
+        <div class="field"><input id="sS" placeholder="Sales" inputmode="numeric" aria-label="Sales"></div>
+        <div class="field"><input id="sA" placeholder="Akm" inputmode="numeric" aria-label="Akm"></div>
+        <button class="btn" id="bOne">Tambah</button>
+      </div>
+      <div class="msg" id="mOne"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Isi Angka Cepat</h3>
+      <textarea id="quick" placeholder="1 1 1 / 1 1 1 / 1 1 1"></textarea>
+      <p class="note">3 deret = Target / Sales / Akm. 2 deret = Sales / Akm. 1 deret = Akm. Jumlah angka per deret harus sama dengan jumlah item (urutan sesuai tabel). Teks seperti "sk" juga boleh.</p>
+      <button class="btn" id="bQuick" style="margin-top:8px">Terapkan</button>
+      <div class="msg" id="mQuick"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Daftar Item</h3>
+      <div id="tbl"></div>
+      <div class="btn-row" style="margin:12px 0 0">
+        <button class="btn btn-ghost" id="bSort">Urutkan A-Z</button>
+        <button class="btn btn-ghost" id="bZero">Kosongkan Sales &amp; Akm</button>
+        <button class="btn btn-ghost" id="bClear">Hapus Semua</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Hasil Laporan</h3>
+      <pre id="out" class="output-pre"></pre>
+      <button class="btn btn-success" id="bCopy" style="margin-top:12px">Salin Laporan</button>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

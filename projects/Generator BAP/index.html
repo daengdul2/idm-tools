@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator BAP</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page-wide">
+    <div class="app-nav">
+      <a href="/" class="back-link">← Menu</a>
+      <span class="app-name">Generator BAP</span>
+    </div>
+
+    <div class="import-box">
+      <div class="field">
+        <label for="importText">Impor data dari teks laporan yang sudah ada</label>
+        <textarea id="importText" placeholder="Tempel teks laporan di sini...&#10;Contoh:&#10;01_saybread_10_5_2✅&#10;01_IFC_12_4_1"></textarea>
+      </div>
+      <button class="btn btn-block" id="btnImport">📥 Masukkan Data ke Laporan</button>
+    </div>
+
+    <h2>Input Data Per Kategori</h2>
+    <div id="formKategori"></div>
+    <button class="btn btn-success btn-block" id="btnTambah">+ Tambah Semua Data Terisi ke Laporan</button>
+
+    <div class="workspace">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Kat</th><th>No</th><th>BPB</th><th>Sales</th><th>BAP</th><th>Stat</th><th>Aksi</th></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div>
+        <textarea id="outputText" class="output output-dark" style="margin-top:0" readonly></textarea>
+        <button class="btn btn-success btn-block" id="btnSalin" style="margin-top:10px">Salin Teks Laporan</button>
+      </div>
+    </div>
+
+    <button class="btn btn-danger btn-block" id="btnReset">⚠ Hapus Semua Data &amp; Mulai Ulang Laporan</button>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

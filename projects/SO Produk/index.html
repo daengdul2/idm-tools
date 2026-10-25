@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stok Opname Toko</title>
+  <link rel="stylesheet" href="/assets/theme.css">
+  <script src="/assets/common.js"></script>
+</head>
+<body>
+  <div class="page-xl">
+    <div class="app-nav">
+      <a href="/" class="back-link">← Menu</a>
+      <div class="toolbar">
+        <button class="btn btn-ghost btn-sm" id="btnStoreName">🏪 Nama Toko</button>
+        <button class="btn btn-ghost btn-sm" id="btnResetAll">↺ Reset Data</button>
+      </div>
+    </div>
+
+    <h1 class="page-title" style="margin-bottom:2px">Stok Opname Toko</h1>
+    <p class="page-sub" id="storeLabel">Pencatatan stok fisik seluruh item</p>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-label">Total Item</div><div class="stat-value" id="statTotal">0</div></div>
+      <div class="stat"><div class="stat-label">Selesai Dihitung</div><div class="stat-value text-info" id="statDone">0</div></div>
+      <div class="stat"><div class="stat-label">Terdapat Selisih</div><div class="stat-value text-bad" id="statDiff">0</div></div>
+      <div class="stat"><div class="stat-label">Total Selisih Unit</div><div class="stat-value" id="statVar">0</div></div>
+    </div>
+
+    <div class="card card-compact toolbar">
+      <div class="grow"><input type="search" id="search" placeholder="Cari PLU / nama item..." aria-label="Cari"></div>
+      <div class="segmented" id="filters">
+        <button class="active" data-filter="all">Semua</button>
+        <button data-filter="discrepancy">Selisih</button>
+        <button data-filter="completed">Selesai</button>
+        <button data-filter="pending">Belum</button>
+      </div>
+      <button class="btn btn-success btn-sm" id="btnImport">Import Massal</button>
+      <button class="btn btn-sm" id="btnAdd">+ Tambah Item</button>
+      <div class="dropdown">
+        <button class="btn btn-ghost btn-sm" id="btnExport">Ekspor / BAP ▾</button>
+        <div class="dropdown-menu hidden" id="exportMenu">
+          <button id="btnCsv">Unduh File CSV</button>
+          <button id="btnBap">Buat Laporan BAP</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="background:var(--surface)">
+      <table>
+        <thead>
+          <tr>
+            <th>PLU / Item</th><th class="num">Stok Sistem</th><th class="num">Fisik (Opname)</th>
+            <th class="num">Selisih</th><th class="num">Status</th><th class="num">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty hidden">Tidak ada produk ditemukan.<br><small>Coba ubah kata kunci atau filter, atau tambahkan item.</small></div>
+    </div>
+
+    <p class="note center" style="margin-top:14px">Data tersimpan otomatis di browser lokal.</p>
+  </div>
+
+  <!-- Modal: Import massal -->
+  <div id="importModal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head"><h3>Import Data Massal</h3><button class="btn btn-ghost btn-icon" data-tutup="importModal" aria-label="Tutup">✕</button></div>
+      <div class="modal-body">
+        <div class="hint">Satu item per baris: <strong>PLU, Nama Item [Stok Sistem]</strong><br>
+          Contoh: <code>8999999012345, SUSU UHT COKLAT 1L 24</code> (angka terakhir = stok sistem, boleh kosong)</div>
+        <div class="field">
+          <textarea id="importText" rows="6" placeholder="8999999012345, SUSU UHT COKLAT 1L 24&#10;8999999067890, MIE INSTAN GORENG 40"></textarea>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label for="importCategory">Kategori untuk item yang diimport</label>
+          <input type="text" id="importCategory" list="categoryList" value="Umum" placeholder="Contoh: Minuman, Snack">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-tutup="importModal">Batal</button>
+        <button class="btn btn-success" id="btnProsesImport">Proses Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Tambah item -->
+  <div id="addModal" class="modal hidden">
+    <form class="modal-box" id="addForm">
+      <div class="modal-head"><h3>Tambah Item Baru</h3><button type="button" class="btn btn-ghost btn-icon" data-tutup="addModal" aria-label="Tutup">✕</button></div>
+      <div class="modal-body">
+        <div class="field"><label for="newPlu">PLU produk</label><input type="text" id="newPlu" placeholder="Contoh: 8999999012345" required></div>
+        <div class="field"><label for="newName">Nama item</label><input type="text" id="newName" placeholder="Contoh: Susu UHT Coklat 1L" required></div>
+        <div class="field"><label for="newCategory">Kategori</label><input type="text" id="newCategory" list="categoryList" value="Umum"><datalist id="categoryList"></datalist></div>
+        <div class="field" style="margin-bottom:0"><label for="newStock">Stok komputer / sistem</label><input type="number" id="newStock" value="0" min="0" required></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-tutup="addModal">Batal</button>
+        <button type="submit" class="btn">Simpan Item</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal: BAP -->
+  <div id="bapModal" class="modal hidden">
+    <div class="modal-box modal-lg">
+      <div class="modal-head"><h3>Berita Acara Stok Opname (BAP)</h3><button class="btn btn-ghost btn-icon" data-tutup="bapModal" aria-label="Tutup">✕</button></div>
+      <div class="modal-body"><pre id="bapContent" class="output-pre" style="font-size:.78rem"></pre></div>
+      <div class="modal-foot"><button class="btn" id="btnCopyBap">Salin Teks BAP</button></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
