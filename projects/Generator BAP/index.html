@@ -6,6 +6,22 @@
   <title>Generator BAP</title>
   <link rel="stylesheet" href="/assets/theme.css">
   <script src="/assets/common.js"></script>
+  <style>
+    :root { --tinggi-scroll: min(420px, 60vh); }
+    .edit-cell { width: 100%; min-width: 56px; padding: 4px 6px; box-sizing: border-box; font: inherit; }
+    td input.edit-cell { text-align: center; }
+
+    /* Form input banyak */
+    .kat-row-banyak { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+    .kat-row-banyak .kat-label { flex: 1 1 100%; }
+    .kat-row-banyak .field { flex: 1 1 110px; }
+    .kat-row-banyak .btn-tambah { flex: 0 0 auto; }
+
+    /* Area gulir */
+    .table-wrap { max-height: var(--tinggi-scroll); overflow: auto; -webkit-overflow-scrolling: touch; }
+    .table-wrap thead th { position: sticky; top: 0; z-index: 1; background: Canvas; color: CanvasText; box-shadow: 0 1px 0 rgba(128,128,128,.4); }
+    #outputText { height: var(--tinggi-scroll); overflow-y: auto; resize: vertical; }
+  </style>
 </head>
 <body>
   <div class="page-wide">
