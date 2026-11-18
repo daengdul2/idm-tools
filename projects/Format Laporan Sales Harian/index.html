@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
+        <title>Laporan Sales Harian</title>
+        <link rel="stylesheet" href="/assets/theme.css" />
+        <script src="/assets/common.js"></script>
+        <style>
+            .stat-grid.dua {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stat-grid.tiga {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .stat-grid {
+                margin-bottom: 0;
+            }
+            .stat-grid .stat-value {
+                font-size: 1.1rem;
+                word-break: break-word;
+            }
+            input[readonly] {
+                opacity: 0.75;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page">
+            <div class="app-nav">
+                <a href="/" class="back-link">← Menu</a>
+                <span class="app-name">Laporan Sales</span>
+            </div>
+
+            <h2 class="page-title">Laporan Sales Harian</h2>
+
+            <div class="card">
+                <h3 class="card-title">Periode &amp; Target</h3>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="edtHari">Hari Ke-</label
+                        ><input
+                            id="edtHari"
+                            type="number"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            placeholder="Contoh: 17"
+                            min="1"
+                            max="31"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="edtTargetSales">Target Sales</label
+                        ><input
+                            id="edtTargetSales"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder="25.899.807"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Data Bulan Lalu</h3>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="edtSpdBl">SPD Bulan Lalu</label
+                        ><input
+                            id="edtSpdBl"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder="SPD bulan lalu"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="edtStdBl">STD Bulan Lalu</label
+                        ><input
+                            id="edtStdBl"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder="STD bulan lalu"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="edtApcBl">APC Bulan Lalu (otomatis)</label
+                        ><input
+                            id="edtApcBl"
+                            readonly
+                            placeholder="SPD ÷ STD"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Data Hari Ini</h3>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="edtSales">Sales (Hari Ini)</label
+                        ><input
+                            id="edtSales"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder="Sales hari ini"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="edtTotalSales">Total Sales (Lalu)</label
+                        ><input
+                            id="edtTotalSales"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder="Akumulasi sales"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="edtStruk">Struk (Hari Ini)</label
+                        ><input
+                            id="edtStruk"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder="Struk hari ini"
+                        />
+                    </div>
+                    <div class="field">
+                        <label for="edtTotalStruk">Total Struk (Lalu)</label
+                        ><input
+                            id="edtTotalStruk"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            placeholder="Akumulasi struk"
+                        />
+                    </div>
+                </div>
+                <p class="note">
+                    Hasil dihitung otomatis dan isian tersimpan di perangkat
+                    ini. Kolom angka otomatis diberi titik ribuan saat diketik
+                    (100.000), dan koma dipakai untuk desimal.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Hasil Perhitungan</h3>
+                <div class="stat-grid dua">
+                    <div class="stat">
+                        <div class="stat-label">Akm Sales</div>
+                        <div class="stat-value" id="tAkmSales">Rp.0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Akm Struk</div>
+                        <div class="stat-value" id="tAkmStruk">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">SPD</div>
+                        <div class="stat-value" id="tSpd">Rp.0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">STD</div>
+                        <div class="stat-value" id="tStd">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">APC (SPD)</div>
+                        <div class="stat-value" id="tApc1">Rp.0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">APC (Sales)</div>
+                        <div class="stat-value" id="tApc2">Rp.0</div>
+                    </div>
+                    <div class="stat" style="grid-column: span 2">
+                        <div class="stat-label">ACH SPD</div>
+                        <div class="stat-value text-info" id="tAch">0,0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Growth vs Bulan Lalu</h3>
+                <div class="stat-grid tiga">
+                    <div class="stat">
+                        <div class="stat-label">SPD</div>
+                        <div class="stat-value" id="tSpdG">0,0%</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">STD</div>
+                        <div class="stat-value" id="tStdG">0,0%</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">APC</div>
+                        <div class="stat-value" id="tApcG">0,0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-danger" id="bReset">
+                    Reset Semua Isian
+                </button>
+            </div>
+        </div>
+
+        <script>
+            const KUNCI = "laporanSalesHarianV1";
+            // edtApcBl tidak ada di sini: nilainya otomatis (SPD Bl ÷ STD Bl), jadi tidak disimpan
+            const FIELDS = [
+                "edtHari",
+                "edtTargetSales",
+                "edtSpdBl",
+                "edtStdBl",
+                "edtSales",
+                "edtTotalSales",
+                "edtStruk",
+                "edtTotalStruk"
+            ];
+
+            /* ---------- Penyimpanan (kunci sendiri, tidak menyentuh data aplikasi lain) ---------- */
+            function simpan() {
+                simpanData(
+                    KUNCI,
+                    Object.fromEntries(FIELDS.map(id => [id, $(id).value]))
+                );
+            }
+
+            function muat() {
+                let d = ambilData(KUNCI, null);
+                if (!d) {
+                    // pindahkan data dari versi lama yang memakai kunci terpisah
+                    d = {};
+                    FIELDS.forEach(id => {
+                        try {
+                            const s = localStorage.getItem(id);
+                            if (s !== null) {
+                                d[id] = s;
+                                localStorage.removeItem(id);
+                            }
+                        } catch (e) {
+                            /* abaikan */
+                        }
+                    });
+                }
+                FIELDS.forEach(id => {
+                    if (d[id] !== undefined) $(id).value = d[id];
+                });
+                FIELD_HARGA.forEach(id => {
+                    $(id).value = rapikanHarga($(id).value);
+                });
+            }
+
+            /* ---------- Util ---------- */
+            /** Baca angka gaya Indonesia: "25.899.807", "1.234,5", "12,5", "12.5" */
+            function bacaAngka(teks) {
+                let v = String(teks)
+                    .trim()
+                    .replace(/rp\.?|\s/gi, "");
+                if (!v) return 0;
+                const negatif = v.startsWith("-");
+                v = v.replace(/[^0-9.,]/g, "");
+                if ((v.match(/,/g) || []).length > 1) v = v.replace(/,/g, "");
+                if (v.includes(",")) v = v.replace(/\./g, "").replace(",", ".");
+                else if (/^\d{1,3}(\.\d{3})+$/.test(v))
+                    v = v.replace(/\./g, "");
+                const n = parseFloat(v);
+                return Number.isFinite(n) ? (negatif ? -n : n) : 0;
+            }
+
+            const ambilAngka = id => bacaAngka($(id).value);
+
+            /* ---------- Format harga: 100000 -> 100.000 (koma = desimal) ---------- */
+            const FIELD_HARGA = FIELDS.filter(id => id !== "edtHari");
+
+            function formatHarga(teks) {
+                let v = teks.replace(/[^0-9,-]/g, "");
+                const negatif = v.startsWith("-");
+                v = v.replace(/-/g, "");
+                const k = v.indexOf(",");
+                let bulat = k === -1 ? v : v.slice(0, k);
+                const desimal =
+                    k === -1 ? null : v.slice(k + 1).replace(/,/g, "");
+                bulat = bulat.replace(/^0+(?=\d)/, "");
+                if (bulat === "" && desimal !== null) bulat = "0";
+                bulat = bulat.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                return (
+                    (negatif ? "-" : "") +
+                    bulat +
+                    (desimal === null ? "" : "," + desimal)
+                );
+            }
+
+            /** Untuk nilai yang ditempel/dimuat: tafsirkan dulu (12.5 = 12,5; 1.500 = 1500), lalu beri titik ribuan */
+            function rapikanHarga(teks) {
+                return teks.trim()
+                    ? formatHarga(String(bacaAngka(teks)).replace(".", ","))
+                    : "";
+            }
+
+            function pasangFormatHarga(id) {
+                const el = $(id);
+                el.addEventListener("input", e => {
+                    const tempel = e.inputType === "insertFromPaste";
+                    const sebelum = el.value.slice(0, el.selectionStart);
+                    const jumlah = (sebelum.match(/[0-9,-]/g) || []).length; // karakter bermakna di kiri kursor
+                    const baru = tempel
+                        ? rapikanHarga(el.value)
+                        : formatHarga(el.value);
+                    if (baru === el.value) return;
+                    el.value = baru;
+                    let pos = baru.length;
+                    if (!tempel) {
+                        let hitung = 0;
+                        pos = 0;
+                        while (pos < baru.length && hitung < jumlah) {
+                            if (/[0-9,-]/.test(baru[pos])) hitung++;
+                            pos++;
+                        }
+                    }
+                    el.setSelectionRange(pos, pos);
+                });
+            }
+
+            const angka = n => Math.round(n).toLocaleString("id-ID");
+            const rupiah = n => "Rp" + angka(n);
+            const persen = (n, tanda = false) => {
+                const r =
+                    Math.round((Number.isFinite(n) ? n : 0) * 10) / 10 || 0;
+                return (
+                    (tanda && r > 0 ? "+" : "") +
+                    r.toLocaleString("id-ID", {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1
+                    }) +
+                    "%"
+                );
+            };
+            const tulis = (id, teks) => {
+                $(id).textContent = teks;
+            };
+
+            /* ---------- Hitung ---------- */
+            function hitung() {
+                const salesHariIni = ambilAngka("edtSales");
+                const totalSalesLalu = ambilAngka("edtTotalSales");
+                const strukHariIni = ambilAngka("edtStruk");
+                const totalStrukLalu = ambilAngka("edtTotalStruk");
+                const hari = ambilAngka("edtHari");
+                const targetSales = ambilAngka("edtTargetSales");
+                const spdBl = ambilAngka("edtSpdBl");
+                const stdBl = ambilAngka("edtStdBl");
+
+                // APC bulan lalu otomatis = SPD bulan lalu / STD bulan lalu
+                const apcBl = stdBl > 0 ? spdBl / stdBl : 0;
+                $("edtApcBl").value = apcBl > 0 ? angka(apcBl) : "";
+
+                const akmSales = salesHariIni + totalSalesLalu;
+                const akmStruk = strukHariIni + totalStrukLalu;
+                const spd = hari > 0 ? akmSales / hari : 0;
+                const std = hari > 0 ? akmStruk / hari : 0;
+                const spdBulat = Math.round(spd);
+                const stdBulat = Math.round(std);
+                const apc1 = stdBulat > 0 ? spdBulat / stdBulat : 0;
+                const apc2 = strukHariIni > 0 ? salesHariIni / strukHariIni : 0;
+
+                const ach = targetSales > 0 ? (spd / targetSales) * 100 : 0;
+                const growth = {
+                    tSpdG: spdBl > 0 ? (spd / spdBl) * 100 - 100 : 0,
+                    tStdG: stdBl > 0 ? (std / stdBl) * 100 - 100 : 0,
+                    tApcG: apcBl > 0 ? (apc1 / apcBl) * 100 - 100 : 0
+                };
+
+                tulis("tAkmSales", rupiah(akmSales));
+                tulis("tAkmStruk", angka(akmStruk));
+                tulis("tSpd", rupiah(spdBulat));
+                tulis("tStd", angka(stdBulat));
+                tulis("tApc1", rupiah(apc1));
+                tulis("tApc2", rupiah(apc2));
+                tulis("tAch", persen(ach));
+                Object.entries(growth).forEach(([id, g]) => {
+                    tulis(id, persen(g, true));
+                    $(id).className =
+                        "stat-value" +
+                        (g >= 0.05
+                            ? " text-ok"
+                            : g <= -0.05
+                              ? " text-bad"
+                              : "");
+                });
+
+                simpan();
+            }
+
+            /* ---------- Init ---------- */
+            document.addEventListener("DOMContentLoaded", () => {
+                muat();
+                hitung();
+                FIELD_HARGA.forEach(pasangFormatHarga); // harus lebih dulu dari hitung agar nilai tersimpan sudah terformat
+                FIELDS.forEach(id => $(id).addEventListener("input", hitung));
+                $("bReset").onclick = () => {
+                    if (!confirm("Kosongkan semua isian?")) return;
+                    FIELDS.forEach(id => {
+                        $(id).value = "";
+                    });
+                    hitung();
+                };
+            });
+        </script>
+    </body>
+</html>
